@@ -32,6 +32,10 @@ bool Triangle::Intersect(const Ray & ray, Intersection & hit) const
 		return false;
 	}
 
+	// Thresholding/round-off w/o this, the shadows will looks scattered and dirty
+	if (t < 0.0001)
+		return false;
+
 	if (hit.HitDistance > t)
 	{
 		hit.HitDistance = t;
@@ -42,9 +46,10 @@ bool Triangle::Intersect(const Ray & ray, Intersection & hit) const
 			n = -n;
 
 		hit.Normal = n;
-	}
-	
-	//std::cout << "The triangle hit point is: " << hit.Position[0] << " " << hit.Position[1] << " " << hit.Position[2] << std::endl;
 
-	return true;
+		return true;
+	}
+	else
+		return false;// w/o this, the other part of the box is visible
+	//std::cout << "The triangle hit point is: " << hit.Position[0] << " " << hit.Position[1] << " " << hit.Position[2] << std::endl;
 }

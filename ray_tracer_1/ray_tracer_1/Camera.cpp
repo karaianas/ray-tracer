@@ -61,19 +61,39 @@ void Camera::Render(Scene & s)
 			{
 				glm::vec3 toLight1, toLight2;
 				glm::vec3 ltPos1, ltPos2;
-				Color c1, c2;
+				Color c1, c2, c;
 
 				float intensity1 = s.GetLight(0).Illuminate(hit.Position, c1, toLight1, ltPos1);
 				float intensity2 = s.GetLight(1).Illuminate(hit.Position, c2, toLight2, ltPos2);
 
 				float angle1 = glm::clamp(dot(hit.Normal, toLight1), 0.f, 1.f);
 				float angle2 = glm::clamp(dot(hit.Normal, toLight2), 0.f, 1.f);
-				
+
 				c1.Scale(intensity1 * angle1);
 				c2.Scale(intensity2 * angle2);
 
-				c1.Add(c2);
-				BMP->SetPixel(x, y, c1.ToInt());
+				// Temporarily test for shadows here
+				Ray sray1;
+				sray1.Direction = toLight1;
+				sray1.Origin = hit.Position;
+
+				Ray sray2;
+				sray2.Direction = toLight2;
+				sray2.Origin = hit.Position;
+
+				Intersection shit1, shit2;
+
+				bool in1, in2;
+				in1 = s.Intersect(sray1, shit1);
+				in2 = s.Intersect(sray2, shit2);
+
+				c.Scale(0);
+				// Not shadowed
+				if (!in1)
+					c.Add(c1);
+				if (!in2)
+					c.Add(c2);
+				BMP->SetPixel(x, y, c.ToInt());
 			}
 			else
 				BMP->SetPixel(x, y, s.GetSkyColor().ToInt());
