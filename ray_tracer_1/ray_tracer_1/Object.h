@@ -13,6 +13,8 @@ class Object {
 public:
 	virtual ~Object()	{}
 	virtual bool Intersect(const Ray &ray, Intersection &hit)=0;
+	virtual glm::vec3 minBBox() = 0;
+	virtual glm::vec3 maxBBox() = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

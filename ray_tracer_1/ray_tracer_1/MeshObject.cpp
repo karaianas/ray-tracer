@@ -8,7 +8,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -212,6 +213,44 @@ void MeshObject::Smooth()
 	}
 	for (i = 0; i<NumVertexes; i++)
 		Vertexes[i].Normal = glm::normalize(Vertexes[i].Normal);
+}
+
+glm::vec3 MeshObject::minBBox()
+{
+	glm::vec3 prev(10000, 10000, 10000);
+	for (int i = 0; i < NumTriangles; i++)
+	{
+		Triangle & tri = Triangles[i];
+		glm::vec3 min = tri.minBBox();
+
+		if (prev[0] > min[0])
+			prev[0] = min[0];
+		if (prev[1] > min[1])
+			prev[1] = min[1];
+		if (prev[2] > min[2])
+			prev[2] = min[2];
+	}
+
+	return prev;
+}
+
+glm::vec3 MeshObject::maxBBox()
+{
+	glm::vec3 prev(-10000, -10000, -10000);
+	for (int i = 0; i < NumTriangles; i++)
+	{
+		Triangle & tri = Triangles[i];
+		glm::vec3 max = tri.maxBBox();
+
+		if (prev[0] > max[0])
+			prev[0] = max[0];
+		if (prev[1] > max[1])
+			prev[1] = max[1];
+		if (prev[2] > max[2])
+			prev[2] = max[2];
+	}
+
+	return prev;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,6 @@
 #include "Triangle.h"
 #include <iostream>
+#include <algorithm>
 
 Triangle::Triangle()
 {
@@ -58,3 +59,31 @@ Vertex Triangle::GetVtx(int i)
 {
 	return *Vtx[i];
 }
+
+glm::vec3 Triangle::GetBarycenter()
+{
+	glm::vec3 avg = Vtx[0]->Position + Vtx[1]->Position + Vtx[2]->Position;
+
+	return avg / 3.0f;
+}
+
+glm::vec3 Triangle::minBBox()
+{
+	float minx, miny, minz;
+	minx = std::min(std::min(Vtx[0]->Position[0], Vtx[1]->Position[0]), Vtx[2]->Position[0]);
+	miny = std::min(std::min(Vtx[0]->Position[1], Vtx[1]->Position[1]), Vtx[2]->Position[1]);
+	minz = std::min(std::min(Vtx[0]->Position[2], Vtx[1]->Position[2]), Vtx[2]->Position[2]);
+	
+	return glm::vec3(minx, miny, minz);
+}
+
+glm::vec3 Triangle::maxBBox()
+{
+	float maxx, maxy, maxz;
+	maxx = std::max(std::max(Vtx[0]->Position[0], Vtx[1]->Position[0]), Vtx[2]->Position[0]);
+	maxy = std::max(std::max(Vtx[0]->Position[1], Vtx[1]->Position[1]), Vtx[2]->Position[1]);
+	maxz = std::max(std::max(Vtx[0]->Position[2], Vtx[1]->Position[2]), Vtx[2]->Position[2]);
+
+	return glm::vec3(maxx, maxy, maxz);
+}
+

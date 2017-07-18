@@ -11,6 +11,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "LambertMaterial.h"
 #include "RayTrace.h"
+#include "BoxTreeObject.h"
 
 void project1();
 void project2();
@@ -80,7 +81,8 @@ void project2()
 	
 	// Render image
 	cam.Render(scn);
-	cam.SaveBitmap("project2.bmp");
+	cam.SaveBitmap("project2.bmp");
+
 }
 
 void project1() {
@@ -91,10 +93,15 @@ void project1() {
 	// Create boxes
 	MeshObject box1;
 	box1.MakeBox(5.0f,0.1f,5.0f);
-	scn.AddObject(box1);
+	//scn.AddObject(box1);
 
 	MeshObject box2;
 	box2.MakeBox(1.0f,1.0f,1.0f);
+
+	// Test
+	BoxTreeObject tree;
+	tree.Construct(box1);
+	scn.AddObject(tree);
 
 	// Actual code
 	InstanceObject inst1(box2);

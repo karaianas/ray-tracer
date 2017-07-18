@@ -6,6 +6,7 @@
 
 #include "Object.h"
 #include "Triangle.h"
+#include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -20,6 +21,12 @@ public:
 
 	bool LoadPLY(const char *filename, Material *mtl = 0);
 	void Smooth();
+
+	glm::vec3 minBBox();
+	glm::vec3 maxBBox();
+
+	int GetTriangleNum() { return NumTriangles; }
+	Triangle* GetTriangles() { return Triangles; }
 
 private:
 	int NumVertexes,NumTriangles;

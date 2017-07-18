@@ -8,6 +8,9 @@ public:
 	void SetChild(Object &obj);
 	void SetMatrix(glm::mat4x4 &mtx);
 
+	glm::vec3 minBBox();
+	glm::vec3 maxBBox();
+
 private:
 	glm::mat4x4 Matrix;
 	glm::mat4x4 Inverse; // Pre-computed inverse of Matrix

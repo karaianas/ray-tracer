@@ -30,3 +30,13 @@ void InstanceObject::SetMatrix(glm::mat4x4 & mtx)
 	Matrix = mtx;
 	Inverse = glm::inverse(mtx);
 }
+
+glm::vec3 InstanceObject::minBBox()
+{
+	return Child->minBBox();
+}
+
+glm::vec3 InstanceObject::maxBBox()
+{
+	return Child->maxBBox();
+}
