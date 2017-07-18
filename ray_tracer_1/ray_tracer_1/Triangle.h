@@ -17,6 +17,8 @@ public:
 
 	bool Intersect(const Ray &ray, Intersection &hit) const;
 
+	Vertex GetVtx(int i);
+
 private:
 	Vertex *Vtx[3];
 	Material *Mtl;

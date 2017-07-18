@@ -53,3 +53,8 @@ bool Triangle::Intersect(const Ray & ray, Intersection & hit) const
 		return false;// w/o this, the other part of the box is visible
 	//std::cout << "The triangle hit point is: " << hit.Position[0] << " " << hit.Position[1] << " " << hit.Position[2] << std::endl;
 }
+
+Vertex Triangle::GetVtx(int i)
+{
+	return *Vtx[i];
+}

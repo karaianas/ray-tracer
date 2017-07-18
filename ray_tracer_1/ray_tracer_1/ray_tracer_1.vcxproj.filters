@@ -63,6 +63,9 @@
     <ClInclude Include="InstanceObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RayTrace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bitmap.cpp">
@@ -90,6 +93,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InstanceObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LambertMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTrace.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

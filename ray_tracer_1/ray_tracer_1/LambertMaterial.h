@@ -15,6 +15,8 @@ public:
 		col.Scale(DiffuseColor,1.0f/pi);
 	}
 
+	void SetColor(Color c);
+
 private:
 	Color DiffuseColor;
 };
