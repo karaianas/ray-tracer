@@ -47,6 +47,11 @@ void MeshObject::MakeBox(float x,float y,float z,Material *mtl) {
 	Triangles=new Triangle[NumTriangles];
 	if(mtl==0) mtl=new LambertMaterial;
 
+	// ------------------------------
+	for (int i = 0; i < NumTriangles; i++)
+		Triangles[i].num = i;
+	// ------------------------------
+
 	x*=0.5f;
 	y*=0.5f;
 	z*=0.5f;
@@ -129,6 +134,7 @@ bool MeshObject::LoadPLY(const char * filename, Material * mtl)
 		printf("ERROR: MeshObject::LoadPLY()- Can't open '%s'\n", filename);
 		return false;
 	}
+	
 	// Read header
 	char tmp[256];
 	int numverts = 0, numtris = 0;
@@ -153,6 +159,7 @@ bool MeshObject::LoadPLY(const char * filename, Material * mtl)
 		fclose(f);
 		return false;
 	}
+	
 	// Read verts
 	int i = 0;
 	if (numverts>0) {
@@ -174,6 +181,7 @@ bool MeshObject::LoadPLY(const char * filename, Material * mtl)
 			}
 		}
 	}
+	
 	// Read tris
 	if (numtris>0) {
 		if (mtl == 0) mtl = new LambertMaterial;
@@ -188,10 +196,13 @@ bool MeshObject::LoadPLY(const char * filename, Material * mtl)
 				return false;
 			}
 			Triangles[i].Init(&Vertexes[i0], &Vertexes[i1], &Vertexes[i2], mtl);
+			//std::cout << Vertexes[i0].Position[0] << " " << Vertexes[i0].Position[1] << " " << Vertexes[i0].Position[2] << std::endl;
 		}
 	}
+	
 	// Smooth
 	if (normprop<0) Smooth();
+	
 	// Close file
 	fclose(f);
 	printf("Loaded %d triangles from file '%s'\n", numtris, filename);
@@ -201,18 +212,27 @@ bool MeshObject::LoadPLY(const char * filename, Material * mtl)
 void MeshObject::Smooth()
 {
 	int i, j;
-	for (i = 0; i<NumVertexes; i++)
+	for (i = 0; i < NumVertexes; i++)
+	{
 		Vertexes[i].Normal = glm::vec3(0);
+		Vertexes[i].num = i;
+	}
 	for (i = 0; i<NumTriangles; i++) {
 		Triangle &tri = Triangles[i];
 		glm::vec3 e1 = tri.GetVtx(1).Position - tri.GetVtx(0).Position;
 		glm::vec3 e2 = tri.GetVtx(2).Position - tri.GetVtx(0).Position;
 		glm::vec3 cross = glm::cross(e1, e2);
-		for (j = 0; j<3; j++)
-			tri.GetVtx(j).Normal += cross;
+		for (j = 0; j < 3; j++)
+		{
+			Vertexes[tri.GetVtx(j).num].Normal += cross;
+			//tri.GetVtx(j).Normal += cross;
+		}
 	}
-	for (i = 0; i<NumVertexes; i++)
+	for (i = 0; i < NumVertexes; i++)
+	{
+		//Vertexes[i].print();
 		Vertexes[i].Normal = glm::normalize(Vertexes[i].Normal);
+	}
 }
 
 glm::vec3 MeshObject::minBBox()
@@ -242,11 +262,11 @@ glm::vec3 MeshObject::maxBBox()
 		Triangle & tri = Triangles[i];
 		glm::vec3 max = tri.maxBBox();
 
-		if (prev[0] > max[0])
+		if (prev[0] < max[0])
 			prev[0] = max[0];
-		if (prev[1] > max[1])
+		if (prev[1] < max[1])
 			prev[1] = max[1];
-		if (prev[2] > max[2])
+		if (prev[2] < max[2])
 			prev[2] = max[2];
 	}
 

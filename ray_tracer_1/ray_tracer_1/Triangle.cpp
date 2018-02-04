@@ -21,6 +21,8 @@ bool Triangle::Intersect(const Ray & ray, Intersection & hit) const
 	float alpha = glm::dot(-d, glm::cross(p - a, c - a) / detM);
 	float beta = glm::dot(-d, glm::cross(b - a, p - a) / detM);
 
+	//std::cout << this->num << std::endl;
+
 	if (detM == 0)
 	{
 		//std::cout << "The ray is parallel to the triangle" << std::endl;
@@ -33,7 +35,7 @@ bool Triangle::Intersect(const Ray & ray, Intersection & hit) const
 		return false;
 	}
 
-	// Thresholding/round-off w/o this, the shadows will looks scattered and dirty
+	// Thresholding/round-off w/o this, the shadows will look scattered and dirty
 	if (t < 0.0001)
 		return false;
 
@@ -51,7 +53,9 @@ bool Triangle::Intersect(const Ray & ray, Intersection & hit) const
 		return true;
 	}
 	else
+	{
 		return false;// w/o this, the other part of the box is visible
+	}
 	//std::cout << "The triangle hit point is: " << hit.Position[0] << " " << hit.Position[1] << " " << hit.Position[2] << std::endl;
 }
 

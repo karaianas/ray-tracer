@@ -43,7 +43,6 @@ void Camera::Render(Scene & s)
 	float scaleX = 2 * glm::tan(HorizonalFOV / 2.0f);
 	float scaleY = 2 * glm::tan(VerticalFOV / 2.0f);
 
-	int x, y;
 	for (int y = 0; y < YRes; y++)
 	{
 		for (int x = 0; x < XRes; x++)

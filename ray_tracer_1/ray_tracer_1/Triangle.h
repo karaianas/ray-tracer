@@ -7,7 +7,7 @@
 #include "Vertex.h"
 #include "Material.h"
 #include "Ray.h"
-
+#include <iostream>
 ////////////////////////////////////////////////////////////////////////////////
 
 class Triangle{
@@ -23,6 +23,8 @@ public:
 
 	glm::vec3 minBBox();
 	glm::vec3 maxBBox();
+
+	int num;
 
 private:
 	Vertex *Vtx[3];
