@@ -14,6 +14,9 @@
 #include "RayTrace.h"
 #include "BoxTreeObject.h"
 
+// TestZone
+#include "Random.h"
+
 #define PI 3.14159
 
 void project1();
@@ -23,8 +26,17 @@ void project2();
 
 int main(int argc,char **argv) {
 	//project1();
-	project2();
+	//project2();
 
+	Random R;
+	//for(int i = 1; i < 10; i++)
+	//	R.RandomNumber64(i, 100);
+	//R.RandomNumber64(9, 10000);
+	//R.RandomNumber32(9, 10000);
+	R.RandomNumbers(9, 100);
+	while (1)
+	{
+	}
 	return 0;
 }
 
