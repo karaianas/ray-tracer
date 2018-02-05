@@ -28,7 +28,7 @@ vector<float> Random::RandomNumber64(uint64_t seed, int number)
 		//cout << next << endl;
 		series.push_back(next);
 	}
-	cout << "bigger:" << countmore << " smaller:" << number - countmore << endl;
+	//cout << "bigger:" << countmore << " smaller:" << number - countmore << endl;
 	return series;
 }
 
@@ -58,7 +58,7 @@ vector<float> Random::RandomNumber32(uint32_t seed, int number)
 		//cout << next << endl;
 		series.push_back(next);
 	}
-	cout << "bigger:" << countmore << " smaller:" << number - countmore << endl;
+	//cout << "bigger:" << countmore << " smaller:" << number - countmore << endl;
 	return series;
 }
 
@@ -95,7 +95,13 @@ vector<glm::vec2> Random::RandomNumbers(uint64_t seed, int pairNumber)
 		if (nextHigh >= 0.5f)
 			counter[1]++;
 	}
-	cout << "bigger:" << counter[0] << " smaller:" << pairNumber - counter[0] << endl;
-	cout << "bigger:" << counter[1] << " smaller:" << pairNumber - counter[1] << endl;
+
+	float r1 = abs(counter[0] / (pairNumber - counter[0]) - 1.0f);
+	float r2 = abs(counter[1] / (pairNumber - counter[1]) - 1.0f);
+	cout << r1 << endl;
+	cout << r2 << endl;
+	cout << sqrt(pow(r1, 2) + pow(r2, 2)) << endl;
+	//cout << "bigger:" << counter[0] << " smaller:" << pairNumber - counter[0] << endl;
+	//cout << "bigger:" << counter[1] << " smaller:" << pairNumber - counter[1] << endl;
 	return series;
 }

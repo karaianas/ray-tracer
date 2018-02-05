@@ -29,11 +29,14 @@ int main(int argc,char **argv) {
 	//project2();
 
 	Random R;
-	//for(int i = 1; i < 10; i++)
-	//	R.RandomNumber64(i, 100);
-	//R.RandomNumber64(9, 10000);
-	//R.RandomNumber32(9, 10000);
-	R.RandomNumbers(9, 100);
+	for (int i = 1; i < 100; i++)
+	{
+		cout << "------------" << i << "-------------" << endl;
+		R.RandomNumbers(i, 100);
+	}
+
+	// 9 is a fairly good seed
+	//R.RandomNumbers(37, 100);
 	while (1)
 	{
 	}
