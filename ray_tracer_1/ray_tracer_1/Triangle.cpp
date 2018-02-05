@@ -1,6 +1,4 @@
 #include "Triangle.h"
-#include <iostream>
-#include <algorithm>
 
 Triangle::Triangle()
 {

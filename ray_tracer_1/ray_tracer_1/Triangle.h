@@ -4,10 +4,11 @@
 
 #pragma once
 
+#include "Core.h"
 #include "Vertex.h"
 #include "Material.h"
+#include "Object.h"
 #include "Ray.h"
-#include <iostream>
 ////////////////////////////////////////////////////////////////////////////////
 
 class Triangle{

@@ -132,7 +132,9 @@
     <ClInclude Include="BoxTreeObject.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="Core.h" />
     <ClInclude Include="DirectLight.h" />
+    <ClInclude Include="FresnelMetalMaterial.h" />
     <ClInclude Include="InstanceObject.h" />
     <ClInclude Include="Intersection.h" />
     <ClInclude Include="LambertMaterial.h" />
@@ -154,9 +156,11 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="DirectLight.cpp" />
+    <ClCompile Include="FresnelMetalMaterial.cpp" />
     <ClCompile Include="InstanceObject.cpp" />
     <ClCompile Include="LambertMaterial.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="MeshObject.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RayTrace.cpp" />

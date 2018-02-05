@@ -1,8 +1,8 @@
 #pragma once
+#include "Core.h"
 #include "Scene.h"
 #include "Triangle.h"
 #include "Object.h"
-#include <iostream>
 #define MaxTrianglesPerBox 3
 
 class BoxTreeNode {

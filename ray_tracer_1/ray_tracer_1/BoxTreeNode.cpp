@@ -1,5 +1,4 @@
 #include "BoxTreeNode.h"
-#include <iostream>
 
 BoxTreeNode::BoxTreeNode()
 {

@@ -4,7 +4,6 @@
 
 #include "MeshObject.h"
 #include "LambertMaterial.h"
-#include "glm/glm.hpp"
 
 #include <stdio.h>
 #include <string.h>

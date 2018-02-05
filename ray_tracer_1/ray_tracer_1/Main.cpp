@@ -2,13 +2,14 @@
 // Main.cpp
 ////////////////////////////////////////
 
+#include "Core.h"
+
 #include "MeshObject.h"
 #include "InstanceObject.h"
 #include "Camera.h"
 #include "PointLight.h"
 #include "DirectLight.h"
 #include "Scene.h"
-#include "glm/gtc/matrix_transform.hpp"
 #include "LambertMaterial.h"
 #include "RayTrace.h"
 #include "BoxTreeObject.h"
@@ -51,9 +52,9 @@ void project2()
 	
 	// Create instance
 	InstanceObject inst(tree);
-	//glm::mat4x4 mtx = glm::eulerY(PI);
-	//mtx[3] = glm::vec4(-0.05f, 0.0f, -0.1f, 1.0f);
-	//inst.SetMatrix(mtx);
+	glm::mat4x4 mtx = glm::eulerAngleY(PI);
+	mtx[3] = glm::vec4(-0.05f, 0.0f, -0.1f, 1.0f);
+	inst.SetMatrix(mtx);
 	scn.AddObject(inst);
 	
 	// Create lights

@@ -1,5 +1,4 @@
 #include "RayTrace.h"
-#include <iostream>
 
 RayTrace::RayTrace(Scene & s)
 {
@@ -39,17 +38,25 @@ bool RayTrace::TraceRay(const Ray & ray, Intersection & hit, int depth)
 		float lightdistance = glm::length(ltPos - hit.Position);
 		float obstdistance = glm::length(shit.Position - hit.Position);
 
+		// No obstacle
 		if (!in)
 		{
 			c.Scale(actual_intensity);
 			hit.Shade.Add(c);
 		}
+		// There was an obstacle
 		else
 		{
+			// Obstacle is beyond light
 			if (obstdistance >= lightdistance)
 			{
 				c.Scale(actual_intensity);
 				hit.Shade.Add(c);
+			}
+			// Obstacle is in between
+			else
+			{
+				// For direct illumination, there is no need for proceeding
 			}
 		}
 
@@ -57,36 +64,6 @@ bool RayTrace::TraceRay(const Ray & ray, Intersection & hit, int depth)
 
 	if (depth == MaxDepth)
 		return true;
-
-	//// Compute shade due to reflections/refractions
-	//glm::vec3 d = -ray.Direction;
-	//
-	//// Reflection
-	//Ray r; 
-	//r.Direction = 2 * glm::dot(d, hit.Normal) * hit.Normal - d;
-	//r.Origin = hit.Position;
-
-	//Intersection rhit;
-	//bool reflect = TraceRay(r, rhit, depth + 1);
-
-	////float n = 2.485;
-	////float k = 3.433;
-	////float rpar_2 = ((pow(n, 2) + pow(k, 2)) * pow(dot(hit.Normal, d), 2) - 2 * n * dot(hit.Normal, d) + 1) / ((pow(n, 2) + pow(k, 2)) * pow(dot(hit.Normal, d), 2) + 2 * n * dot(hit.Normal, d) + 1);
-	////float rper_2 = ((pow(n, 2) + pow(k, 2)) + pow(dot(hit.Normal, d), 2) - 2 * n * dot(hit.Normal, d)) / ((pow(n, 2) + pow(k, 2)) + pow(dot(hit.Normal, d), 2) + 2 * n * dot(hit.Normal, d));
-	////float f = 1.0f / 2.0f * (rpar_2 + rper_2);
-	//rhit.Shade.Scale(0.f);
-	//hit.Shade.Add(rhit.Shade);
-
-	//// Refraction
-	//glm::vec3 z = 0.5f * glm::dot(d, hit.Normal) - d;
-	//Ray t;
-	//t.Direction = z - glm::sqrt(1 - pow(glm::length(z), 2)) * hit.Normal;
-	//t.Origin = hit.Position;
-
-	//Intersection thit;
-	//bool refract = TraceRay(t, thit, depth + 1);
-	//thit.Shade.Scale(0.f);
-	//hit.Shade.Add(thit.Shade);
 
 	return true;
 }

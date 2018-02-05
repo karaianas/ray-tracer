@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "glm/glm.hpp"
+#include "Core.h"
 #include "Bitmap.h"
 #include "Ray.h"
 #include "Intersection.h"
