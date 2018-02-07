@@ -90,6 +90,8 @@ void project3()
 		mtx[3] = glm::vec4(0.0f, 0.0f, 0.3f*(float(i) / float(numDragons - 1) - 0.5f), 1.0f);
 		inst->SetMatrix(mtx);
 		inst->SetMaterial(mtl[i]);
+		//----
+		//if(i == 1)	
 		scn.AddObject(*inst);
 	}
 	

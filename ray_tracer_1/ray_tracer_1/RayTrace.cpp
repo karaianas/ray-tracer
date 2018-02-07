@@ -5,7 +5,7 @@ using namespace std;
 RayTrace::RayTrace(Scene & s)
 {
 	Scn = &s;
-	MaxDepth = 20;
+	MaxDepth = 10;
 }
 
 bool RayTrace::TraceRay(const Ray & ray, Intersection & hit, int depth)
@@ -145,7 +145,8 @@ bool RayTrace::TracePath(const Ray & ray, Intersection & hit, int depth)
 
 	}
 
-	hit.Shade = totalColor;
+	//hit.Shade = totalColor;
+
 	// (2) Indirect light
 	
 	// (2-1) Generate sample ray
@@ -161,8 +162,9 @@ bool RayTrace::TracePath(const Ray & ray, Intersection & hit, int depth)
 	Intersection nextHit;
 	TracePath(sampleRay, nextHit, depth + 1);
 
-	// (2-2) Add indirect light * nextHit.Shade * reflectance
-	//hit.Mtl->ComputeReflectance(sth, ray.Direction, outDir, hit);
+	// (2-2) Add indirect light
+	// *****************************
+	//hit.Mtl->ComputeReflectance(nextHit.Shade, ray.Direction, outDir, hit);
 	outColor.Multiply(nextHit.Shade);
 
 	totalColor.Add(outColor);

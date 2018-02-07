@@ -1,6 +1,5 @@
 #include "Camera.h"
 #include "RayTrace.h"
-#define PI 3.14159
 
 Camera::Camera()
 {
