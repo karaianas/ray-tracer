@@ -9,14 +9,20 @@ LambertMaterial::LambertMaterial()
 
 void LambertMaterial::GenerateSample(const Intersection & isect, const glm::vec3 & inDir, glm::vec3 & outDir, Color & outColor)
 {
-	int seed = rand() % 1000 + 10;
+	// Come up with better solution if possible
+	int seed = rand() % 1000 + 100;
 	glm::vec2 pair = R.RandomNumbers(seed, 1)[0];
 	float u = 2 * PI * pair[0];
-	float v = sqrt(1 - pow(pair[1], 2));
+	float v = sqrt(1 - pair[1]);
 
 	glm::vec3 P(v * glm::cos(u), sqrt(pair[1]), v * glm::sin(u));
 	outDir = glm::normalize(GetCoord(isect.Normal) * P);
 	outColor = DiffuseColor;
+}
+
+void LambertMaterial::GetColor(Color &c)
+{
+	c = DiffuseColor;
 }
 
 void LambertMaterial::SetColor(Color c)
@@ -48,18 +54,18 @@ glm::mat3 LambertMaterial::GetCoord(glm::vec3 Normal)
 	M[1] = Normal;
 	M[2] = k;
 
-	for (int i = 0; i < 100; i++)
-	{
-		int seed = rand() % 1000 + 10;
-		glm::vec2 pair = R.RandomNumbers(seed, 1)[0];
-		float u = 2 * PI * pair[0];
-		float v = sqrt(1 - pair[1]);
+	//for (int i = 0; i < 100; i++)
+	//{
+	//	int seed = rand() % 1000 + 10;
+	//	glm::vec2 pair = R.RandomNumbers(seed, 1)[0];
+	//	float u = 2 * PI * pair[0];
+	//	float v = sqrt(1 - pair[1]);
 
-		glm::vec3 P(v * glm::cos(u), sqrt(pair[1]), v * glm::sin(u));
-		glm::vec3 result = M * P;
-		result = glm::normalize(result);
-		cout << result[0] << " " << result[1] << " " << result[2] << endl;
-	}
+	//	glm::vec3 P(v * glm::cos(u), sqrt(pair[1]), v * glm::sin(u));
+	//	glm::vec3 result = M * P;
+	//	result = glm::normalize(result);
+	//	cout << result[0] << " " << result[1] << " " << result[2] << endl;
+	//}
 	
 	return M;
 }
