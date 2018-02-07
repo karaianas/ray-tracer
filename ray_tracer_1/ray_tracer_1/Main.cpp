@@ -111,76 +111,9 @@ void project3()
 	//cam.SetShirley(true);
 	// Render image
 	cam.Render(scn);
-	cam.SaveBitmap("project3.bmp");
-}
-
-/*
-void project3()
-{
-	// Create scene
-	Scene scn;
-	scn.SetSkyColor(Color(0.8f, 0.9f, 1.0f));
-
-	// Create ground
-	LambertMaterial groundMtl;
-	groundMtl.SetColor(Color(0.25f, 0.25f, 0.25f));
-	MeshObject ground;
-	ground.MakeBox(2.0f, 0.11f, 2.0f, &groundMtl);
-	scn.AddObject(ground);
-
-	cout << "Ground material made" << endl;
-
-	// Materials
-	LambertMaterial white;
-	white.SetColor(Color(0.7f, 0.7f, 0.7f));
-
-	FresnelMetalMaterial metal;
-	metal.SetColor(Color(0.95f, 0.64f, 0.54f));
-	// Load dragon mesh
-	MeshObject dragon;
-	dragon.LoadPLY("dragon.ply");
-	// Create box tree
-	BoxTreeObject tree;
-	tree.Construct(dragon);
-	InstanceObject *inst = new InstanceObject(tree);
-	inst->SetMaterial(&white);
-	scn.AddObject(*inst);
-
-	// Create lights
-	DirectLight sunlgt;
-	sunlgt.SetBaseColor(Color(1.0f, 1.0f, 0.9f));
-	sunlgt.SetIntensity(1.0f);
-	sunlgt.SetDirection(glm::vec3(2.0f, -3.0f, -2.0f));
-	scn.AddLight(sunlgt);
-
-	cout << "Light made" << endl;
-
-	// Create camera
-	Camera cam;
-	cam.SetResolution(640, 480);
-	cam.SetAspect(1.33f);
-	//cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f));
-	//cam.LookAt(glm::vec3(-0.1f, 0.1f, 0.2f), glm::vec3(-0.05f, 0.12f, 0.0f),
-	//	glm::vec3(0, 1.0f, 0));
-	cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f),
-		glm::vec3(0, 1.0f, 0));
-	cam.SetFOV(40.0f);
-	//cam.SetSuperSample(10, 10);
-	//cam.SetJitter(true);
-	//cam.SetShirley(true);
-
-	cout << "Camera made" << endl;
-
-	// Render image
-	cam.Render(scn);
 	cam.SaveBitmap("project3.bmp");
 
-	cout << "Rendered" << endl;
-	while (1)
-	{
-	}
 }
-*/
 
 void project2()
 {

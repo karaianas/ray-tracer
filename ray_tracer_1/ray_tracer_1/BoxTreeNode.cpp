@@ -58,19 +58,14 @@ bool BoxTreeNode::IntersectVolume(const Ray &ray, Intersection &hit)
 
 bool BoxTreeNode::Intersect(const Ray & ray, Intersection & hit)
 {
+
 	// If this is a leaf node, test against triangles
 	if (isLeaf)
 	{
-		bool in = false;
 		for (int i = 0; i < numTri; i++)
-		{
 			if (Tri[i]->Intersect(ray, hit))
-			{
-				//std::cout << "!" << std::endl;
-				in = true;
-			}
-		}
-		return in;
+				return true;
+		return false;
 	}
 
 	// Test all child volumes
@@ -78,7 +73,6 @@ bool BoxTreeNode::Intersect(const Ray & ray, Intersection & hit)
 	volhit[0].HitDistance = hit.HitDistance;
 	volhit[1].HitDistance = hit.HitDistance;
 
-	// ****There is no test on whether it actually did intersect or not!!!
 	bool child1 = Child1->IntersectVolume(ray, volhit[0]);
 	bool child2 = Child2->IntersectVolume(ray, volhit[1]);
 	bool success = false;
