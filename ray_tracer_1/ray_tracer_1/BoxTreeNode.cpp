@@ -1,5 +1,7 @@
 #include "BoxTreeNode.h"
 
+using namespace std;
+
 BoxTreeNode::BoxTreeNode()
 {
 }
@@ -73,41 +75,31 @@ bool BoxTreeNode::Intersect(const Ray & ray, Intersection & hit)
 
 	// Test all child volumes
 	Intersection volhit[2];// Because this is a binary tree
-	
-	// First child
 	volhit[0].HitDistance = hit.HitDistance;
-	Child1->IntersectVolume(ray, volhit[0]);
-
-	// Second child
 	volhit[1].HitDistance = hit.HitDistance;
-	Child2->IntersectVolume(ray, volhit[1]);
 
-	// Full recursive test on children, sorted in order of distance
+	// ****There is no test on whether it actually did intersect or not!!!
+	bool child1 = Child1->IntersectVolume(ray, volhit[0]);
+	bool child2 = Child2->IntersectVolume(ray, volhit[1]);
 	bool success = false;
-	int order[2];
-	if (volhit[0].HitDistance < volhit[1].HitDistance)
+	// ------------------------------
+	if (child1)
 	{
-		order[0] = 0;
-		order[1] = 1;
+		if (volhit[0].HitDistance < hit.HitDistance)
+			if (Child1->Intersect(ray, hit))
+			{
+				success = true;
+			}
 	}
-	else
+	if (child2)
 	{
-		order[0] = 1;
-		order[1] = 0;
+		if (volhit[1].HitDistance < hit.HitDistance)
+			if (Child2->Intersect(ray, hit))
+			{
+				success = true;
+			}
 	}
-
-	BoxTreeNode* Child[2];
-	Child[0] = Child1; Child[1] = Child2;
-
-	// First triangles to be tested
-	if (volhit[order[0]].HitDistance < hit.HitDistance)
-		if (Child[order[0]]->Intersect(ray, hit)) 
-			success = true;
-
-	// Second triangles to be tested
-	if (volhit[order[1]].HitDistance < hit.HitDistance)
-		if (Child[order[1]]->Intersect(ray, hit))
-			success = true;
+	// ------------------------------
 
 	return success;
 }
