@@ -208,5 +208,6 @@ void BoxTreeNode::Construct(int count, Triangle *tri)
 	Child2->Construct(count2, tri2);
 	
 	// Free up arrays
-	//delete[]tri1; delete[]tri2;
+	//delete[]tri1; delete[]tri2;
+
 }

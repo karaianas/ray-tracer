@@ -30,7 +30,7 @@ public:
 	static Color WHITE,GREY,BLACK;
 	static Color RED,YELLOW,BLUE,GREEN;
 
-private:
+//private:
 	float Red,Green,Blue;
 };
 

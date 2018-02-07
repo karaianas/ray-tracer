@@ -12,6 +12,8 @@ public:
 	
 	void GenerateSample(const Intersection &isect, const glm::vec3 &inDir, glm::vec3 &outDir, Color &outColor);
 
+	void GetColor(Color &c);
+
 	void SetColor(Color c);
 
 private:

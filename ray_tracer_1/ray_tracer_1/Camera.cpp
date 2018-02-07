@@ -56,7 +56,8 @@ void Camera::Render(Scene & s)
 			Intersection hit;
 
 			RayTrace RT(s);
-			bool in = RT.TraceRay(ray, hit, 0);
+			//bool in = RT.TraceRay(ray, hit, 0);
+			bool in = RT.TracePath(ray, hit, 0);
 			if (in)
 				BMP->SetPixel(x, y, hit.Shade.ToInt());
 			else

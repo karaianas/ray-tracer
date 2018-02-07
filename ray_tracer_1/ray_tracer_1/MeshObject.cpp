@@ -32,7 +32,11 @@ MeshObject::~MeshObject() {
 bool MeshObject::Intersect(const Ray &ray, Intersection &hit) {
 	bool success=false;
 	for(int i=0;i<NumTriangles;i++)
-		if(Triangles[i].Intersect(ray,hit)) success=true;
+		if (Triangles[i].Intersect(ray, hit))
+		{
+			success = true;
+			hit.Mtl = Mtl;
+		}
 	return success;
 }
 
@@ -44,7 +48,16 @@ void MeshObject::MakeBox(float x,float y,float z,Material *mtl) {
 	NumTriangles=12;
 	Vertexes=new Vertex[NumVertexes];
 	Triangles=new Triangle[NumTriangles];
-	if(mtl==0) mtl=new LambertMaterial;
+	if (mtl == 0)
+	{
+		cout << "No material specified" << endl;
+		mtl = new LambertMaterial;
+	}
+	else
+	{
+		cout << "Material specified" << endl;
+		Mtl = mtl;
+	}
 
 	// ------------------------------
 	for (int i = 0; i < NumTriangles; i++)
@@ -132,6 +145,17 @@ bool MeshObject::LoadPLY(const char * filename, Material * mtl)
 	if (f == 0) {
 		printf("ERROR: MeshObject::LoadPLY()- Can't open '%s'\n", filename);
 		return false;
+	}
+
+	if (mtl == 0)
+	{
+		cout << "No material specified" << endl;
+		mtl = new LambertMaterial;
+	}
+	else
+	{
+		cout << "Dragon Material specified" << endl;
+		Mtl = mtl;
 	}
 	
 	// Read header

@@ -7,6 +7,7 @@
 #include "Core.h"
 #include "Object.h"
 #include "Triangle.h"
+#include "Material.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -32,6 +33,8 @@ private:
 	int NumVertexes,NumTriangles;
 	Vertex *Vertexes;
 	Triangle *Triangles;
+	// -------------------
+	Material *Mtl;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -17,6 +17,9 @@ bool InstanceObject::Intersect(const Ray & ray, Intersection & hit)
 	hit.Normal = glm::vec3(Matrix * glm::vec4(hit.Normal, 0));
 	hit.HitDistance = glm::distance(ray.Origin, hit.Position); // Correct for any scaling
 	
+	// -------------------
+	hit.Mtl = Mtl;
+
 	return true;
 }
 
@@ -29,6 +32,11 @@ void InstanceObject::SetMatrix(glm::mat4x4 & mtx)
 {
 	Matrix = mtx;
 	Inverse = glm::inverse(mtx);
+}
+
+void InstanceObject::SetMaterial(Material* mtl)
+{
+	Mtl = mtl;
 }
 
 glm::vec3 InstanceObject::minBBox()
