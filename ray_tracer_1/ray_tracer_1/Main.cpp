@@ -17,8 +17,6 @@
 // TestZone
 #include "Random.h"
 
-#define PI 3.14159
-
 void project1();
 void project2();
 
@@ -28,12 +26,18 @@ int main(int argc,char **argv) {
 	//project1();
 	//project2();
 
-	Random R;
-	for (int i = 1; i < 100; i++)
-	{
-		cout << "------------" << i << "-------------" << endl;
-		R.RandomNumbers(i, 100);
-	}
+	// Coord test
+	LambertMaterial mat;
+	glm::mat3 sth = mat.GetCoord(glm::vec3(0.0f, 1.0f, .0f));
+	mat.print(sth);
+	
+	// Random test
+	//Random R;
+	//for (int i = 1; i < 100; i++)
+	//{
+	//	cout << "------------" << i << "-------------" << endl;
+	//	R.RandomNumbers(i, 100);
+	//}
 
 	// 9 is a fairly good seed
 	//R.RandomNumbers(37, 100);

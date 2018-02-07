@@ -90,17 +90,17 @@ vector<glm::vec2> Random::RandomNumbers(uint64_t seed, int pairNumber)
 		float nextHigh = float(high) / float(UINT32_MAX);
 		
 		series.push_back(glm::vec2(nextLow, nextHigh));
-		if (nextLow >= 0.5f)
-			counter[0]++;
-		if (nextHigh >= 0.5f)
-			counter[1]++;
+		//if (nextLow >= 0.5f)
+		//	counter[0]++;
+		//if (nextHigh >= 0.5f)
+		//	counter[1]++;
 	}
 
-	float r1 = abs(counter[0] / (pairNumber - counter[0]) - 1.0f);
-	float r2 = abs(counter[1] / (pairNumber - counter[1]) - 1.0f);
-	cout << r1 << endl;
-	cout << r2 << endl;
-	cout << sqrt(pow(r1, 2) + pow(r2, 2)) << endl;
+	//float r1 = abs(counter[0] / (pairNumber - counter[0]) - 1.0f);
+	//float r2 = abs(counter[1] / (pairNumber - counter[1]) - 1.0f);
+	//cout << r1 << endl;
+	//cout << r2 << endl;
+	//cout << sqrt(pow(r1, 2) + pow(r2, 2)) << endl;
 	//cout << "bigger:" << counter[0] << " smaller:" << pairNumber - counter[0] << endl;
 	//cout << "bigger:" << counter[1] << " smaller:" << pairNumber - counter[1] << endl;
 	return series;
