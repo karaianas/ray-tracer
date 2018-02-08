@@ -5,7 +5,7 @@ using namespace std;
 void FresnelMetalMaterial::ComputeReflectance(Color & col, const glm::vec3 & in, const glm::vec3 & out, const Intersection & hit)
 {
 	// **********************
-	col.Scale(0.0f);
+	col.Set(0.0f, 0.0f, 0.0f);
 }
 
 void FresnelMetalMaterial::GenerateSample(const Intersection & isect, const glm::vec3 & inDir, glm::vec3 & outDir, Color & outColor)

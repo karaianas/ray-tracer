@@ -23,6 +23,7 @@ void LambertMaterial::GenerateSample(const Intersection & isect, const glm::vec3
 void LambertMaterial::GetColor(Color &c)
 {
 	c = DiffuseColor;
+	//c.Scale(1.0f / PI);
 }
 
 void LambertMaterial::SetColor(Color c)

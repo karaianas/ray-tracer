@@ -75,7 +75,7 @@ vector<glm::vec2> Random::RandomNumbers(uint64_t seed, int pairNumber)
 	seed ^= seed << 35;
 	seed ^= seed >> 4;
 
-	glm::vec2 counter(0, 0);
+	//glm::vec2 counter(0, 0);
 
 	for (int i = 0; i < pairNumber; i++)
 	{

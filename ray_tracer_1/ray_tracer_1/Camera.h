@@ -9,7 +9,9 @@
 #include "Ray.h"
 #include "Intersection.h"
 #include "Scene.h"
+#include "Random.h"
 ////////////////////////////////////////////////////////////////////////////////
+
 
 class Camera {
 public:
@@ -21,6 +23,9 @@ public:
 	void Render(Scene &s);
 	void SaveBitmap(char *filename);
 
+	// Project 3
+	void SetSuperSample(int xsamples, int ysamples);
+
 	// Render each pixel
 	void RenderPixel(int x, int y);
 
@@ -30,4 +35,7 @@ private:
 	float VerticalFOV;
 	float Aspect;
 	Bitmap* BMP;
+
+	// Project 3
+	int nx, ny;
 };

@@ -106,17 +106,23 @@ void project3()
 	Camera cam;
 	cam.SetResolution(640, 480);
 	cam.SetAspect(1.33f);
-	//cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
-	cam.LookAt(glm::vec3(-0.2f, 0.08f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
+	cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
+	// Close up
+	//cam.LookAt(glm::vec3(-0.2f, 0.08f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
 
 	cam.SetFOV(40.0f);
 	//cam.SetSuperSample(10, 10);
 	//cam.SetJitter(true);
 	//cam.SetShirley(true);
+
 	// Render image
+	// Cam test
+	cam.SetSuperSample(1, 2);
 	cam.Render(scn);
 	cam.SaveBitmap("project3.bmp");
-
+	while (1)
+	{
+	}
 }
 
 void project2()

@@ -16,9 +16,10 @@ public:
 
 	void ComputeReflectance(Color &col, const glm::vec3 &in, const glm::vec3 &out, const Intersection &hit) 
 	{
+		// ***** Why dividing by PI produces a match?
 		col = DiffuseColor;
-		col.Scale(1.0f / PI);
-		//col.Scale(DiffuseColor, 1.0f);
+		//col.Scale(1.0f / PI);
+
 		//col.Scale(DiffuseColor, 1.0f / PI);
 	}
 

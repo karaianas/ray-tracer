@@ -115,17 +115,17 @@ bool RayTrace::TracePath(const Ray & ray, Intersection & hit, int depth)
 		// No obstacle
 		if (!in)
 		{
-			c.Scale(directLight);
-			Color temp = Color::BLACK;
-			hit.Mtl->GetColor(temp);
-			c.Multiply(temp);
-			totalColor.Add(c);
-
 			//c.Scale(directLight);
 			//Color temp = Color::BLACK;
-			//hit.Mtl->ComputeReflectance(temp, ray.Direction, ray.Direction, hit);
+			//hit.Mtl->GetColor(temp);
 			//c.Multiply(temp);
 			//totalColor.Add(c);
+
+			c.Scale(directLight);
+			Color temp = Color::BLACK;
+			hit.Mtl->ComputeReflectance(temp, ray.Direction, ray.Direction, hit);
+			c.Multiply(temp);
+			totalColor.Add(c);
 		}
 		// There was an obstacle
 		else
@@ -133,17 +133,17 @@ bool RayTrace::TracePath(const Ray & ray, Intersection & hit, int depth)
 			// Obstacle is beyond light
 			if (obstdistance >= lightdistance)
 			{
-				c.Scale(directLight);
-				Color temp = Color::BLACK;
-				hit.Mtl->GetColor(temp);
-				c.Multiply(temp);
-				totalColor.Add(c);
-
 				//c.Scale(directLight);
 				//Color temp = Color::BLACK;
-				//hit.Mtl->ComputeReflectance(temp, ray.Direction, ray.Direction, hit);
+				//hit.Mtl->GetColor(temp);
 				//c.Multiply(temp);
 				//totalColor.Add(c);
+
+				c.Scale(directLight);
+				Color temp = Color::BLACK;
+				hit.Mtl->ComputeReflectance(temp, ray.Direction, ray.Direction, hit);
+				c.Multiply(temp);
+				totalColor.Add(c);
 			}
 			// Obstacle is in between
 			else
@@ -172,8 +172,6 @@ bool RayTrace::TracePath(const Ray & ray, Intersection & hit, int depth)
 	TracePath(sampleRay, nextHit, depth + 1);
 
 	// (2-2) Add indirect light
-	// *****************************
-	//hit.Mtl->ComputeReflectance(nextHit.Shade, ray.Direction, outDir, hit);
 	outColor.Multiply(nextHit.Shade);
 
 	totalColor.Add(outColor);
