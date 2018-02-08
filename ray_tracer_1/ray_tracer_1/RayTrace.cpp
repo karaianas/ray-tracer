@@ -118,10 +118,14 @@ bool RayTrace::TracePath(const Ray & ray, Intersection & hit, int depth)
 			c.Scale(directLight);
 			Color temp = Color::BLACK;
 			hit.Mtl->GetColor(temp);
-			//cout << temp.Red << " " << temp.Green << " " << temp.Blue << endl;
 			c.Multiply(temp);
 			totalColor.Add(c);
-			//hit.Shade.Add(c);
+
+			//c.Scale(directLight);
+			//Color temp = Color::BLACK;
+			//hit.Mtl->ComputeReflectance(temp, ray.Direction, ray.Direction, hit);
+			//c.Multiply(temp);
+			//totalColor.Add(c);
 		}
 		// There was an obstacle
 		else
@@ -134,7 +138,12 @@ bool RayTrace::TracePath(const Ray & ray, Intersection & hit, int depth)
 				hit.Mtl->GetColor(temp);
 				c.Multiply(temp);
 				totalColor.Add(c);
-				//hit.Shade.Add(c);
+
+				//c.Scale(directLight);
+				//Color temp = Color::BLACK;
+				//hit.Mtl->ComputeReflectance(temp, ray.Direction, ray.Direction, hit);
+				//c.Multiply(temp);
+				//totalColor.Add(c);
 			}
 			// Obstacle is in between
 			else

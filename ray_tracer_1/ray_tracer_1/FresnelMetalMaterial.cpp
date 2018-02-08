@@ -5,24 +5,13 @@ using namespace std;
 void FresnelMetalMaterial::ComputeReflectance(Color & col, const glm::vec3 & in, const glm::vec3 & out, const Intersection & hit)
 {
 	// **********************
-	col.Scale(1.0f);
-
-	//glm::vec3 reflected = glm::reflect(-in, hit.Normal);
-	//
-	//// *** How to set the threshold?
-	//if (glm::length(reflected - out) > 0.001f)
-	//{
-	//	cout << "lol" << endl;
-	//	col.Set(0.0f, 0.0f, 0.0f);
-	//}
-	//else
-	//	col = DiffuseColor;
+	col.Scale(0.0f);
 }
 
 void FresnelMetalMaterial::GenerateSample(const Intersection & isect, const glm::vec3 & inDir, glm::vec3 & outDir, Color & outColor)
 {
 	// Assuming total reflection:
-	outDir = glm::reflect(-inDir, isect.Normal);
+	outDir = glm::reflect(inDir, isect.Normal);
 	outColor = DiffuseColor; 
 
 	// **********************
@@ -31,7 +20,8 @@ void FresnelMetalMaterial::GenerateSample(const Intersection & isect, const glm:
 
 void FresnelMetalMaterial::GetColor(Color &c)
 {
-	c = DiffuseColor;
+	//c = DiffuseColor;
+	c.Scale(1.0f);
 }
 
 void FresnelMetalMaterial::SetColor(Color c)
