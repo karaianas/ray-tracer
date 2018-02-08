@@ -75,11 +75,16 @@ bool BoxTreeNode::Intersect(const Ray & ray, Intersection & hit)
 
 	bool child1 = Child1->IntersectVolume(ray, volhit[0]);
 	bool child2 = Child2->IntersectVolume(ray, volhit[1]);
+
+	// Check if the ray starts from inside
+	glm::vec3 p = ray.Origin;
+	bool insideBox = (BoxMin[0] <= p[0] && BoxMax[0] >= p[0]) && (BoxMin[1] <= p[1] && BoxMax[1] >= p[1]) && (BoxMin[2] <= p[2] && BoxMax[2] >= p[2]);
+
 	bool success = false;
 	// ------------------------------
 	if (child1)
 	{
-		if (volhit[0].HitDistance < hit.HitDistance)
+		if (volhit[0].HitDistance < hit.HitDistance || insideBox)
 			if (Child1->Intersect(ray, hit))
 			{
 				success = true;
@@ -87,7 +92,7 @@ bool BoxTreeNode::Intersect(const Ray & ray, Intersection & hit)
 	}
 	if (child2)
 	{
-		if (volhit[1].HitDistance < hit.HitDistance)
+		if (volhit[1].HitDistance < hit.HitDistance || insideBox)
 			if (Child2->Intersect(ray, hit))
 			{
 				success = true;

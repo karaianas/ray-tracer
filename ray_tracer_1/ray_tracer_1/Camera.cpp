@@ -49,16 +49,13 @@ void Camera::Render(Scene & s)
 	float scaleX = 2 * glm::tan(HorizonalFOV / 2.0f);
 	float scaleY = 2 * glm::tan(VerticalFOV / 2.0f);
 
-	int counter = 0;
 	for (int y = 0; y < YRes; y++)
 	{
 		for (int x = 0; x < XRes; x++)
 		{
-			//int num = rand() % 100 + 10;
-			//vector<glm::vec2> samples = R.RandomNumbers(num, nx * ny);
-			int color = 0;
-
-			/*
+			Color c;
+			c.Set(0.0f, 0.0f, 0.0f);
+			
 			// Within a pixel
 			for (int index = 0; index < nx * ny; index++)
 			{
@@ -67,10 +64,6 @@ void Camera::Render(Scene & s)
 
 				float s_ = -0.5f + float(j) / float(nx) + samples[index][0] / float(nx);
 				float t_ = -0.5f + float(i) / float(ny) + samples[index][1] / float(ny);
-				//cout << "(" << j << ", " << i << ")" << endl;
-				//cout << "-------------------------" << endl;
-				//cout << "(" << samples[index][0] << ", " << samples[index][1] << ")" << endl;
-				//cout << "(" << s << ", " << t << ")" << endl;
 
 				float fx = ((float(x) + 0.5f + s_)) / float(XRes) - 0.5f;
 				float fy = ((float(y) + 0.5f + t_)) / float(YRes) - 0.5f;
@@ -83,27 +76,22 @@ void Camera::Render(Scene & s)
 
 				RayTrace RT(s);
 
-				// Basic ray tracer
-				//bool in = RT.TraceRay(ray, hit, 0);
-
 				// Path tracer
 				bool in = RT.TracePath(ray, hit, 0);
 
 				if (in)
 				{
-					//color += hit.Shade.ToInt();
-					BMP->SetPixel(x, y, hit.Shade.ToInt());
+					c.Add(hit.Shade);
 				}
 				else
 				{
-					//color += s.GetSkyColor().ToInt();
-					BMP->SetPixel(x, y, s.GetSkyColor().ToInt());
+					c.Add(hit.Shade);
 				}
 
 			}
-			*/
-			//BMP->SetPixel(x, y, int(float(color)/float(nx * ny)));
-
+			
+			c.Scale(1.0f / float(nx * ny));
+			BMP->SetPixel(x, y, c.ToInt());
 		}
 
 	}
