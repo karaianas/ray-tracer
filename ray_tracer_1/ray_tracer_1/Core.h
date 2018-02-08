@@ -7,4 +7,7 @@
 #include <algorithm>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
+#include <string>
+
 #define PI 3.14159

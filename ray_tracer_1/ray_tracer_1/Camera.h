@@ -25,6 +25,7 @@ public:
 
 	// Project 3
 	void SetSuperSample(int xsamples, int ysamples);
+	void SetJitter(bool enable);
 
 	// Render each pixel
 	void RenderPixel(int x, int y);
@@ -38,4 +39,5 @@ private:
 
 	// Project 3
 	int nx, ny;
+	bool EnableJitter;
 };

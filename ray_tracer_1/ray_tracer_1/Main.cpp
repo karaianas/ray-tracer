@@ -14,9 +14,9 @@
 #include "FresnelMetalMaterial.h"
 #include "RayTrace.h"
 #include "BoxTreeObject.h"
-
-// TestZone
 #include "Random.h"
+
+using namespace std;
 
 void project1();
 void project2();
@@ -25,29 +25,11 @@ void project3();
 ////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc,char **argv) {
+	
 	//project1();
 	//project2();
 	project3();
 
-	// Coord test
-	//LambertMaterial mat;
-	//glm::mat3 sth = mat.GetCoord(glm::vec3(0.0f, 1.0f, .0f));
-	//mat.print(sth);
-	
-	// Random test
-	//Random R;
-	//for (int i = 1; i < 100; i++)
-	//{
-	//	cout << "------------" << i << "-------------" << endl;
-	//	R.RandomNumbers(i, 100);
-	//}
-
-	// 9 is a fairly good seed
-	//R.RandomNumbers(37, 100);
-
-	//while (1)
-	//{
-	//}
 	return 0;
 }
 
@@ -90,8 +72,6 @@ void project3()
 		mtx[3] = glm::vec4(0.0f, 0.0f, 0.3f*(float(i) / float(numDragons - 1) - 0.5f), 1.0f);
 		inst->SetMatrix(mtx);
 		inst->SetMaterial(mtl[i]);
-		//----
-		//if(i == 1)	
 		scn.AddObject(*inst);
 	}
 	
@@ -107,19 +87,39 @@ void project3()
 	cam.SetResolution(640, 480);
 	cam.SetAspect(1.33f);
 	cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
-	// Close up
 	//cam.LookAt(glm::vec3(-0.2f, 0.08f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
-
 	cam.SetFOV(40.0f);
-	cam.SetSuperSample(4, 4);
-	//cam.SetJitter(true);
+	
+	int nx, ny;
+	cout << "Enter number of samples: ";
+	cin >> nx >> ny;
+	cam.SetSuperSample(nx, ny);
+	cam.SetJitter(true);
 	//cam.SetShirley(true);
 
-	// Render image
-	// Cam test
-	cam.Render(scn);
-	cam.SaveBitmap("project3_4by4_reflect.bmp");
+	clock_t t;
+	t = clock();
 
+	// Render image
+	cam.Render(scn);
+
+	t = clock() - t;
+	int seconds = ((float)t) / CLOCKS_PER_SEC;
+	printf("Time: %d clicks (%f seconds).\n", t, seconds);
+
+	// Save image
+	string name = "project3_";
+	name += to_string(nx);
+	name += "by";
+	name += to_string(ny);
+	name += "_";
+	name += to_string(seconds);
+	name += ".bmp";
+	cam.SaveBitmap((char*)name.c_str());
+
+	//while (1)
+	//{
+	//}
 }
 
 void project2()

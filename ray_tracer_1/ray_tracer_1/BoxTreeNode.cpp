@@ -80,26 +80,55 @@ bool BoxTreeNode::Intersect(const Ray & ray, Intersection & hit)
 	glm::vec3 p = ray.Origin;
 	bool insideBox = (BoxMin[0] <= p[0] && BoxMax[0] >= p[0]) && (BoxMin[1] <= p[1] && BoxMax[1] >= p[1]) && (BoxMin[2] <= p[2] && BoxMax[2] >= p[2]);
 
-	bool success = false;
-	// ------------------------------
-	if (child1)
-	{
-		if (volhit[0].HitDistance < hit.HitDistance || insideBox)
-			if (Child1->Intersect(ray, hit))
-			{
-				success = true;
-			}
-	}
-	if (child2)
-	{
-		if (volhit[1].HitDistance < hit.HitDistance || insideBox)
-			if (Child2->Intersect(ray, hit))
-			{
-				success = true;
-			}
-	}
-	// ------------------------------
+	// Find the nearer child
+	int order[2] = { 0, 1 };
+	BoxTreeNode* nearChild = Child1;
+	BoxTreeNode* farChild = Child2;
 
+	if (volhit[0].HitDistance > volhit[1].HitDistance)
+	{
+		order[0] = 1;
+		order[1] = 0;
+		nearChild = Child2;
+		farChild = Child1;
+	}
+
+	bool success = false;
+
+	/*
+	if (nearChild)
+	{
+		if (volhit[order[0]].HitDistance < hit.HitDistance)
+			if (nearChild->Intersect(ray, hit))
+			{
+				if (!insideBox)
+					return success = true;
+				else
+					success = true;
+			}
+	}
+	if (farChild)
+	{
+		if (volhit[order[1]].HitDistance < hit.HitDistance || insideBox)
+			if (farChild->Intersect(ray, hit))
+				success = true;
+	}
+	*/
+	
+	if (nearChild)
+	{
+		if (volhit[order[0]].HitDistance < hit.HitDistance || insideBox)
+			if (nearChild->Intersect(ray, hit))
+				success = true;
+	}
+	if (farChild)
+	{
+		if (volhit[order[1]].HitDistance < hit.HitDistance || insideBox)
+			if (farChild->Intersect(ray, hit))
+				success = true;
+	}
+	
+	
 	return success;
 }
 
