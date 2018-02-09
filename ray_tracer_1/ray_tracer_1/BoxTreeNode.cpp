@@ -94,26 +94,6 @@ bool BoxTreeNode::Intersect(const Ray & ray, Intersection & hit)
 	}
 
 	bool success = false;
-
-	/*
-	if (nearChild)
-	{
-		if (volhit[order[0]].HitDistance < hit.HitDistance)
-			if (nearChild->Intersect(ray, hit))
-			{
-				if (!insideBox)
-					return success = true;
-				else
-					success = true;
-			}
-	}
-	if (farChild)
-	{
-		if (volhit[order[1]].HitDistance < hit.HitDistance || insideBox)
-			if (farChild->Intersect(ray, hit))
-				success = true;
-	}
-	*/
 	
 	if (nearChild)
 	{
@@ -157,7 +137,6 @@ void BoxTreeNode::Construct(int count, Triangle *tri)
 			Tri[i] = &tri[i];
 			//std::cout << "Leaf:" << Tri[i]->num << std::endl;
 		}
-		//std::cout << "--------------" << std::endl;
 		isLeaf = true;
 		return;
 	}

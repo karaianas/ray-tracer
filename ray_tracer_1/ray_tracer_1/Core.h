@@ -9,5 +9,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string>
+#include <thread>
 
 #define PI 3.14159

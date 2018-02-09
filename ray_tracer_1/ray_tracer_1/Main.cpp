@@ -21,6 +21,8 @@ using namespace std;
 void project1();
 void project2();
 void project3();
+void mthread_test();
+void doCalc(int tid);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -28,12 +30,43 @@ int main(int argc,char **argv) {
 	
 	//project1();
 	//project2();
-	project3();
+	//project3();
+	mthread_test();
 
+	while (1)
+	{
+	}
 	return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void mthread_test()
+{
+	int numThread = 5;
+	thread* threadArray = new thread[numThread - 1];
+	for (int i = 0; i < numThread - 1; i++)
+	{
+		threadArray[i] = thread(doCalc, i);
+	}
+
+	// Once they are finished, they are joined with the main thread
+	for (int i = 0; i < numThread - 1; i++)
+	{
+		threadArray[i].join();
+	}
+}
+
+void doCalc(int tid)
+{
+	int x = 4;
+
+	for (int i = 0; i < 10; i++)
+	{
+		x *= pow(x, i);
+	}
+	cout << tid << endl;
+}
+
 void project3()
 {
 	// Create scene
