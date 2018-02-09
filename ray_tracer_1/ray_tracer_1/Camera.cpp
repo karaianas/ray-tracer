@@ -181,7 +181,7 @@ void Camera::BlockProcess(Scene &s, float scaleX, float scaleY, int counter, vec
 				RayTrace RT(s);
 
 				// Path tracer
-				bool in = RT.TracePath(ray, hit, 0);
+				bool in = RT.TracePath(ray, hit, 0, 1.0f);
 
 				//if (in)
 				//	c.Add(hit.Shade);

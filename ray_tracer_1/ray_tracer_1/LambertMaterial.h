@@ -18,7 +18,7 @@ public:
 	{
 		// ***** Why dividing by PI produces a match?
 		col = DiffuseColor;
-		//col.Scale(1.0f / PI);
+		col.Scale(1.0f / PI);
 
 		//col.Scale(DiffuseColor, 1.0f / PI);
 	}

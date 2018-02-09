@@ -20,8 +20,8 @@ void FresnelMetalMaterial::GenerateSample(const Intersection & isect, const glm:
 
 void FresnelMetalMaterial::GetColor(Color &c)
 {
-	//c = DiffuseColor;
-	c.Scale(1.0f);
+	c = DiffuseColor;
+	//c.Scale(1.0f);
 }
 
 void FresnelMetalMaterial::SetColor(Color c)

@@ -70,7 +70,7 @@ bool RayTrace::TraceRay(const Ray & ray, Intersection & hit, int depth)
 	return true;
 }
 
-bool RayTrace::TracePath(const Ray & ray, Intersection & hit, int depth)
+bool RayTrace::TracePath(const Ray & ray, Intersection & hit, int depth, float weight)
 {
 	// Nothing was hit
 	if (Scn->Intersect(ray, hit) == false)
@@ -154,11 +154,12 @@ bool RayTrace::TracePath(const Ray & ray, Intersection & hit, int depth)
 
 	}
 
-	//hit.Shade = totalColor;
-
 	// (2) Indirect light
 	
-	// (2-1) Generate sample ray
+	// (2-1) Russian Roulette
+	//w *= hit.Mtl->GetColor();
+
+	// (2-2) Generate sample ray
 	glm::vec3 outDir;
 	Color outColor;
 	hit.Mtl->GenerateSample(hit, ray.Direction, outDir, outColor);
@@ -167,11 +168,11 @@ bool RayTrace::TracePath(const Ray & ray, Intersection & hit, int depth)
 	sampleRay.Direction = outDir;
 	sampleRay.Origin = hit.Position;
 
-	// (2-1) Find next intersection
+	// (2-3) Find next intersection
 	Intersection nextHit;
 	TracePath(sampleRay, nextHit, depth + 1);
 
-	// (2-2) Add indirect light
+	// (2-4) Add indirect light
 	outColor.Multiply(nextHit.Shade);
 
 	totalColor.Add(outColor);
