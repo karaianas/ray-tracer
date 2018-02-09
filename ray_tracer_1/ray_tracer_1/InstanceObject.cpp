@@ -10,6 +10,7 @@ bool InstanceObject::Intersect(const Ray & ray, Intersection & hit)
 	Ray ray2;
 	ray2.Origin = glm::vec3(Inverse * glm::vec4(ray.Origin, 1));
 	ray2.Direction = glm::vec3(Inverse * glm::vec4(ray.Direction, 0));
+
 	if (Child->Intersect(ray2, hit) == false) 
 		return false;
 	

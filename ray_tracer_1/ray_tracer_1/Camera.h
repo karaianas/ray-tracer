@@ -10,6 +10,8 @@
 #include "Intersection.h"
 #include "Scene.h"
 #include "Random.h"
+#include "RayTrace.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -29,6 +31,9 @@ public:
 
 	// Render each pixel
 	void RenderPixel(int x, int y);
+
+	// Multi-threading
+	void BlockProcess(Scene &s, float scaleX, float scaleY, int counter, vector<glm::vec2> samples);
 
 private:
 	int XRes, YRes;

@@ -30,8 +30,8 @@ int main(int argc,char **argv) {
 	
 	//project1();
 	//project2();
-	//project3();
-	mthread_test();
+	project3();
+	//mthread_test();
 
 	while (1)
 	{
