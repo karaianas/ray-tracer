@@ -137,11 +137,12 @@ void project3()
 	cam.Render(scn);
 
 	t = clock() - t;
-	int seconds = ((float)t) / CLOCKS_PER_SEC;
-	printf("Time: %d clicks (%f seconds).\n", t, seconds);
+	int seconds = ((double)t) / CLOCKS_PER_SEC;
+	//printf("Time: %d clicks (%f seconds).\n", t, seconds);
+	cout << seconds << " seconds elapsed"<< endl;
 
 	// Save image
-	string name = "project3_";
+	string name = "test_";
 	name += to_string(nx);
 	name += "by";
 	name += to_string(ny);

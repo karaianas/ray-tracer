@@ -179,6 +179,8 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets" Condition="Exists('..\packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets')" />
     <Import Project="..\packages\glm.0.9.8.4\build\native\glm.targets" Condition="Exists('..\packages\glm.0.9.8.4\build\native\glm.targets')" />
+    <Import Project="..\packages\opencv.win.native.redist.320.1.1-vs141\build\native\opencv.win.native.redist.targets" Condition="Exists('..\packages\opencv.win.native.redist.320.1.1-vs141\build\native\opencv.win.native.redist.targets')" />
+    <Import Project="..\packages\opencv.win.native.320.1.1-vs141\build\native\opencv.win.native.targets" Condition="Exists('..\packages\opencv.win.native.320.1.1-vs141\build\native\opencv.win.native.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -186,5 +188,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets'))" />
     <Error Condition="!Exists('..\packages\glm.0.9.8.4\build\native\glm.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glm.0.9.8.4\build\native\glm.targets'))" />
+    <Error Condition="!Exists('..\packages\opencv.win.native.redist.320.1.1-vs141\build\native\opencv.win.native.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\opencv.win.native.redist.320.1.1-vs141\build\native\opencv.win.native.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\opencv.win.native.320.1.1-vs141\build\native\opencv.win.native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\opencv.win.native.320.1.1-vs141\build\native\opencv.win.native.targets'))" />
   </Target>
 </Project>

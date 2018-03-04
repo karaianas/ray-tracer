@@ -51,9 +51,10 @@ void Camera::Render(Scene & s)
 		int num = rand() % 100 + 10;
 		samples = R.RandomNumbers(num, nx * ny * XRes * YRes);
 
-		#pragma omp parallel for
+		#pragma omp parallel
 		for (int y = 0; y < YRes; y++)
 		{
+			#pragma omp for schedule(dynamic,1)
 			for (int x = 0; x < XRes; x++)
 			{
 
@@ -101,8 +102,10 @@ void Camera::Render(Scene & s)
 	}
 	else
 	{
+		#pragma omp parallel
 		for (int y = 0; y < YRes; y++)
 		{
+			#pragma omp for schedule(dynamic,1)
 			for (int x = 0; x < XRes; x++)
 			{
 				float fx = ((float(x) + 0.5f)) / float(XRes) - 0.5f;
