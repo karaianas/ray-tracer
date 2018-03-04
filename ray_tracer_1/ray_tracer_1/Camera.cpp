@@ -51,6 +51,7 @@ void Camera::Render(Scene & s)
 		int num = rand() % 100 + 10;
 		samples = R.RandomNumbers(num, nx * ny * XRes * YRes);
 
+		#pragma omp parallel for
 		for (int y = 0; y < YRes; y++)
 		{
 			for (int x = 0; x < XRes; x++)
@@ -60,7 +61,7 @@ void Camera::Render(Scene & s)
 				{
 					Color c;
 					c.Set(0.0f, 0.0f, 0.0f);
-
+					//cout << "--------------" << endl;
 					for (int index = 0; index < nx * ny; index++)
 					{
 						int j = index % nx;
@@ -69,6 +70,7 @@ void Camera::Render(Scene & s)
 						float s_ = -0.5f + float(j) / float(nx) + samples[index + counter][0] / float(nx);
 						float t_ = -0.5f + float(i) / float(ny) + samples[index + counter][1] / float(ny);
 
+						//cout << s_ << " " << t_ << endl;
 						float fx = ((float(x) + 0.5f + s_)) / float(XRes) - 0.5f;
 						float fy = ((float(y) + 0.5f + t_)) / float(YRes) - 0.5f;
 

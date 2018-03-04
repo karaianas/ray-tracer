@@ -10,5 +10,6 @@
 #include <time.h>
 #include <string>
 #include <thread>
+#include <omp.h>
 
 #define PI 3.14159
