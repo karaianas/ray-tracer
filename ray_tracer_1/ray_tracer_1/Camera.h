@@ -45,4 +45,9 @@ private:
 	// Project 3
 	int nx, ny;
 	bool EnableJitter;
+
+public:
+	// Buffers
+	Bitmap* A;
+	Bitmap* B;
 };

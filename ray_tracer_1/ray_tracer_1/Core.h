@@ -11,5 +11,6 @@
 #include <string>
 #include <thread>
 #include <omp.h>
+#include <random>
 
 #define PI 3.14159

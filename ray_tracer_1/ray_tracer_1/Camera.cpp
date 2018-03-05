@@ -22,6 +22,9 @@ void Camera::SetResolution(int x, int y)
 	XRes = x;
 	YRes = y;
 	BMP = new Bitmap(x, y);
+
+	A = new Bitmap(x, y);
+	B = new Bitmap(x, y);
 	//std::cout << BMP->GetXRes() << " " << BMP->GetYRes() << std::endl;
 }
 
@@ -48,9 +51,20 @@ void Camera::Render(Scene & s)
 
 	if (EnableJitter)
 	{
-		int num = rand() % 100 + 10;
+		int num = rand() % 100 + 100;
 		samples = R.RandomNumbers(num, nx * ny * XRes * YRes);
 
+		//vector<float> test;
+		//mt19937::result_type seed = time(0);
+		//for (int i = 0; i < nx * ny * XRes * YRes; i++)
+		//{
+		//	auto real_rand = std::bind(std::uniform_real_distribution<double>(0, 1), mt19937(seed));
+		//	test.push_back(float(real_rand()));
+		//}
+
+
+		//for (int i = 0; i < nx * ny * XRes * YRes);
+		
 		#pragma omp parallel
 		for (int y = 0; y < YRes; y++)
 		{
@@ -62,18 +76,23 @@ void Camera::Render(Scene & s)
 				{
 					Color c;
 					c.Set(0.0f, 0.0f, 0.0f);
+
+					Color a, b;
+					a.Set(0.0f, 0.0f, 0.0f);
+					b.Set(0.0f, 0.0f, 0.0f);
 					//cout << "--------------" << endl;
 					for (int index = 0; index < nx * ny; index++)
 					{
 						int j = index % nx;
 						int i = (index - j) / nx;
 
-						float s_ = -0.5f + float(j) / float(nx) + samples[index + counter][0] / float(nx);
-						float t_ = -0.5f + float(i) / float(ny) + samples[index + counter][1] / float(ny);
+						float s_ = float(j) / float(nx) + samples[index + counter][0] / float(nx);
+						float t_ = float(i) / float(ny) + samples[index + counter][1] / float(ny);
 
 						//cout << s_ << " " << t_ << endl;
-						float fx = ((float(x) + 0.5f + s_)) / float(XRes) - 0.5f;
-						float fy = ((float(y) + 0.5f + t_)) / float(YRes) - 0.5f;
+						float fx = ((float(x) + s_)) / float(XRes) - 0.5f;
+						float fy = ((float(y) + t_)) / float(YRes) - 0.5f;
+						//cout << fx << " " << fy << endl;
 
 						Ray ray;
 						ray.Direction = glm::normalize(fx * scaleX * WorldMatrix[0] + fy * scaleY * WorldMatrix[1] - WorldMatrix[2]);
@@ -87,15 +106,33 @@ void Camera::Render(Scene & s)
 						bool in = RT.TracePath(ray, hit, 0);
 
 						if (in)
+						{
 							c.Add(hit.Shade);
+							if (index % 2 == 0)
+								a.Add(hit.Shade);
+							else
+								b.Add(hit.Shade);
+						}
 						else
+						{
 							c.Add(hit.Shade);
+							if (index % 2 == 0)
+								a.Add(hit.Shade);
+							else
+								b.Add(hit.Shade);
+						}
 
 						counter++;
 
 					}
 					c.Scale(1.0f / float(nx * ny));
 					BMP->SetPixel(x, y, c.ToInt());
+
+					a.Scale(2.0f / float(nx * ny));
+					A->SetPixel(x, y, a.ToInt());
+
+					b.Scale(2.0f / float(nx * ny));
+					B->SetPixel(x, y, b.ToInt());
 				}
 			}
 		}

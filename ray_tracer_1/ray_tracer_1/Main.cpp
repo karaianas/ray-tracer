@@ -35,9 +35,9 @@ int main(int argc,char **argv) {
 	
 	//project1();
 	//project2();
-	//project3();
+	project3();
 	//mthread_test();
-	filter_test();
+	//filter_test();
 
 	while (1)
 	{
@@ -51,7 +51,7 @@ void filter_test()
 	Img* I = new Img();
 	I->setConstants(1, 3);
 	I->readImg();
-	I->getBoundary();
+	I->filter();
 	I->showImg();
 }
 
@@ -165,6 +165,11 @@ void project3()
 	name += to_string(seconds);
 	name += ".bmp";
 	cam.SaveBitmap((char*)name.c_str());
+
+	string nameA = ".//Result//test_A.bmp";
+	cam.A->SaveBMP((char*)nameA.c_str());
+	string nameB = ".//Result//test_B.bmp";
+	cam.B->SaveBMP((char*)nameB.c_str());
 
 	//while (1)
 	//{
