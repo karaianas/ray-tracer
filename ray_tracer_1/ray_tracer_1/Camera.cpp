@@ -25,8 +25,15 @@ void Camera::SetResolution(int x, int y)
 	A = new Bitmap(x, y);
 	B = new Bitmap(x, y);
 
-	I = new Img();
-	I->empVar(YRes, XRes);
+	Ia = new Img();
+	Ia->empVar(YRes, XRes);
+
+	Ib = new Img();
+	Ib->empVar(YRes, XRes);
+
+	It = new Img();
+	It->empVar(YRes, XRes);
+
 	//std::cout << BMP->GetXRes() << " " << BMP->GetYRes() << std::endl;
 }
 
@@ -76,19 +83,13 @@ void Camera::Render(Scene & s)
 					Color c;
 					c.Set(0.0f, 0.0f, 0.0f);
 
-					vector<Color> acolors, bcolors;
+					vector<Color> tcolors;
 					Color a, b;
 					a.Set(0.0f, 0.0f, 0.0f);
 					b.Set(0.0f, 0.0f, 0.0f);
 					//cout << "--------------" << endl;
 					for (int index = 0; index < nx * ny; index++)
 					{
-						// ----------------------
-						//Color A, B;
-						//A.Set(0.0f, 0.0f, 0.0f);
-						//B.Set(0.0f, 0.0f, 0.0f);
-						// ----------------------
-
 						int j = index % nx;
 						int i = (index - j) / nx;
 
@@ -114,16 +115,10 @@ void Camera::Render(Scene & s)
 						c.Add(hit.Shade);
 
 						if (index % 2 == 0)
-						{
 							a.Add(hit.Shade);
-							acolors.push_back(hit.Shade);
-						}
 						else
-						{
 							b.Add(hit.Shade);
-							bcolors.push_back(hit.Shade);
-						}
-
+						tcolors.push_back(hit.Shade);
 						counter++;
 
 					}
@@ -138,9 +133,9 @@ void Camera::Render(Scene & s)
 					B->SetPixel(x, y, b.ToInt());
 
 					// Need to calculate empirical variances here
-					I->setEmpV(YRes - y, x, getVariance(a, acolors));
-					getVariance(b, bcolors);
-
+					It->setEmpV(YRes - y, x, getVariance(c, tcolors, 0));
+					Ia->setEmpV(YRes - y, x, getVariance(a, tcolors, 1));
+					Ib->setEmpV(YRes - y, x, getVariance(b, tcolors, 2));
 				}
 			}
 		}
@@ -178,7 +173,7 @@ void Camera::Render(Scene & s)
 		}
 	}
 
-	I->showImg('e');
+	It->showImg('e');
 	//std::cout << BMP.GetXRes()  << " " << BMP.GetYRes() << " " << BMP.getpix() << std::endl;
 }
 
@@ -249,7 +244,7 @@ void Camera::BlockProcess(Scene &s, float scaleX, float scaleY, int counter, vec
 	}
 }
 
-glm::vec3 Camera::getVariance(Color & avg, vector<Color>& colors)
+glm::vec3 Camera::getVariance(Color & avg, vector<Color>& colors, int mode)
 {
 	glm::vec3 var(0.0f);
 	float r = avg.Red;
@@ -257,12 +252,46 @@ glm::vec3 Camera::getVariance(Color & avg, vector<Color>& colors)
 	float b = avg.Blue;
 	float rsum = 0.0f; float gsum = 0.0f; float bsum = 0.0f;
 
-	for (auto c : colors)
+	// Total variance
+	if (mode == 0)
 	{
-		rsum += pow(c.Red - r, 2.0f);
-		gsum += pow(c.Green - g, 2.0f);
-		bsum += pow(c.Blue - b, 2.0f);
+		for (int i = 0; i < colors.size(); i++)
+		{
+			Color c = colors[i];
+			rsum += pow(c.Red - r, 2.0f);
+			gsum += pow(c.Green - g, 2.0f);
+			bsum += pow(c.Blue - b, 2.0f);
+		}
 	}
+	// Variance of A
+	else if (mode == 1)
+	{
+		for (int i = 0; i < colors.size() - 1; i+=2)
+		{
+			Color c = colors[i];
+			rsum += pow(c.Red - r, 2.0f);
+			gsum += pow(c.Green - g, 2.0f);
+			bsum += pow(c.Blue - b, 2.0f);
+		}
+	}
+	// Variance of B
+	else if (mode == 2)
+	{
+		for (int i = 1; i < colors.size(); i+=2)
+		{
+			Color c = colors[i];
+			rsum += pow(c.Red - r, 2.0f);
+			gsum += pow(c.Green - g, 2.0f);
+			bsum += pow(c.Blue - b, 2.0f);
+		}
+	}
+	//for (auto c : colors)
+	//{
+	//	rsum += pow(c.Red - r, 2.0f);
+	//	gsum += pow(c.Green - g, 2.0f);
+	//	bsum += pow(c.Blue - b, 2.0f);
+	//}
 
-	return glm::vec3(rsum, gsum, bsum) / float(colors.size());
+	float div = (mode == 0) ? colors.size() : colors.size() / 2.0f;
+	return glm::vec3(rsum, gsum, bsum) / div;
 }

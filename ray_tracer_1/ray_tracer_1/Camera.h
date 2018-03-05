@@ -38,7 +38,7 @@ public:
 	void BlockProcess(Scene &s, float scaleX, float scaleY, int counter, vector<glm::vec2> samples);
 
 	// Calculated empirical variance
-	glm::vec3 getVariance(Color & avg, vector<Color>& colors);
+	glm::vec3 getVariance(Color & avg, vector<Color>& colors, int mode);
 
 private:
 	int XRes, YRes;
@@ -56,5 +56,7 @@ public:
 	Bitmap* A;
 	Bitmap* B;
 
-	Img* I;
+	Img* Ia;
+	Img* Ib;
+	Img* It;
 };
