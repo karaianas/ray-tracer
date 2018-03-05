@@ -4,7 +4,6 @@ using namespace std;
 
 Camera::Camera()
 {
-	
 }
 
 void Camera::SetFOV(float f)
@@ -25,6 +24,9 @@ void Camera::SetResolution(int x, int y)
 
 	A = new Bitmap(x, y);
 	B = new Bitmap(x, y);
+
+	I = new Img();
+	I->empVar(YRes, XRes);
 	//std::cout << BMP->GetXRes() << " " << BMP->GetYRes() << std::endl;
 }
 
@@ -74,12 +76,19 @@ void Camera::Render(Scene & s)
 					Color c;
 					c.Set(0.0f, 0.0f, 0.0f);
 
+					vector<Color> acolors, bcolors;
 					Color a, b;
 					a.Set(0.0f, 0.0f, 0.0f);
 					b.Set(0.0f, 0.0f, 0.0f);
 					//cout << "--------------" << endl;
 					for (int index = 0; index < nx * ny; index++)
 					{
+						// ----------------------
+						//Color A, B;
+						//A.Set(0.0f, 0.0f, 0.0f);
+						//B.Set(0.0f, 0.0f, 0.0f);
+						// ----------------------
+
 						int j = index % nx;
 						int i = (index - j) / nx;
 
@@ -102,26 +111,23 @@ void Camera::Render(Scene & s)
 						// Path tracer
 						bool in = RT.TracePath(ray, hit, 0);
 
-						if (in)
+						c.Add(hit.Shade);
+
+						if (index % 2 == 0)
 						{
-							c.Add(hit.Shade);
-							if (index % 2 == 0)
-								a.Add(hit.Shade);
-							else
-								b.Add(hit.Shade);
+							a.Add(hit.Shade);
+							acolors.push_back(hit.Shade);
 						}
 						else
 						{
-							c.Add(hit.Shade);
-							if (index % 2 == 0)
-								a.Add(hit.Shade);
-							else
-								b.Add(hit.Shade);
+							b.Add(hit.Shade);
+							bcolors.push_back(hit.Shade);
 						}
 
 						counter++;
 
 					}
+
 					c.Scale(1.0f / float(nx * ny));
 					BMP->SetPixel(x, y, c.ToInt());
 
@@ -130,6 +136,11 @@ void Camera::Render(Scene & s)
 
 					b.Scale(2.0f / float(nx * ny));
 					B->SetPixel(x, y, b.ToInt());
+
+					// Need to calculate empirical variances here
+					I->setEmpV(YRes - y, x, getVariance(a, acolors));
+					getVariance(b, bcolors);
+
 				}
 			}
 		}
@@ -166,6 +177,8 @@ void Camera::Render(Scene & s)
 			}
 		}
 	}
+
+	I->showImg('e');
 	//std::cout << BMP.GetXRes()  << " " << BMP.GetYRes() << " " << BMP.getpix() << std::endl;
 }
 
@@ -234,4 +247,22 @@ void Camera::BlockProcess(Scene &s, float scaleX, float scaleY, int counter, vec
 			//BMP->SetPixel(x, y, c.ToInt());
 		}
 	}
+}
+
+glm::vec3 Camera::getVariance(Color & avg, vector<Color>& colors)
+{
+	glm::vec3 var(0.0f);
+	float r = avg.Red;
+	float g = avg.Green;
+	float b = avg.Blue;
+	float rsum = 0.0f; float gsum = 0.0f; float bsum = 0.0f;
+
+	for (auto c : colors)
+	{
+		rsum += pow(c.Red - r, 2.0f);
+		gsum += pow(c.Green - g, 2.0f);
+		bsum += pow(c.Blue - b, 2.0f);
+	}
+
+	return glm::vec3(rsum, gsum, bsum) / float(colors.size());
 }

@@ -18,6 +18,8 @@ public:
 
 	void setBuffers(const char* filepathA, const char* filepathB);
 	void initVarEst();
+	void empVar(int h, int w);
+	void setEmpV(int i, int j, glm::vec3 value);
 
 	void Filter(int mode);
 	void filter(Mat& M0, Mat& M1);
@@ -25,7 +27,7 @@ public:
 	
 	float getDistPatch(int pi, int pj, int qi, int qj, Mat & M);
 	Vec3f getDistPix(int pi, int pj, int qi, int qj, Mat & M);
-	Vec3f getModDistPix(int pi, int pj, int qi, int qj, float vp, float vq);
+	Vec3f getModDistPix(int pi, int pj, int qi, int qj, Mat & M);
 
 	float getWeight(float patchDist) { return exp(-1.0f * max(0.0f, patchDist)); };
 	void setConstants(int r_, int f_) { r = r_; f = f_; };
@@ -37,7 +39,7 @@ private:
 	Mat A, B;
 
 	// Variance
-	Mat V;
+	Mat V, V_e;
 
 	// Filtered
 	Mat F;

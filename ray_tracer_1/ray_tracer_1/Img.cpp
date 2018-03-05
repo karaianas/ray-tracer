@@ -50,6 +50,11 @@ void Img::showImg(char c)
 		namedWindow("Filtered", CV_WINDOW_AUTOSIZE);
 		imshow("Filtered", F);
 	}
+	else if (c == 'e')
+	{
+		namedWindow("Empirical Variance", CV_WINDOW_AUTOSIZE);
+		imshow("Empirical Variance", V_e);
+	}
 
 	waitKey(0);
 }
@@ -109,29 +114,23 @@ void Img::initVarEst()
 	V *= 0.5f;
 }
 
-void Img::filterPixel(int i, int j, Mat& M0, Mat& M1)
+void Img::empVar(int h, int w)
 {
-	float totalW = 0.0f;
-	Vec3f sum(0.0f);
+	//V_e = V.clone(); // Mat::zeros(height, width, CV_32F);
+	V_e = Mat(h, w, CV_8UC3, Scalar(0, 0, 0));
 
-	// Iterate all neighboring patches in buffer M1
-	for (int offset = -r; offset <= r; offset++)
-	{
-		float D = getDistPatch(i, j, i + offset, j + offset, M1);
-		float w = getWeight(D);
-		totalW += w;
-		Vec3b q = M1.at<Vec3b>(i + offset, j + offset);
-		sum[0] += w * float(q.val[0]) / 255.0f;
-		sum[1] += w * float(q.val[1]) / 255.0f;
-		sum[2] += w * float(q.val[2]) / 255.0f;
-	}
+	//for(int i = 0; i < height; i++)
+	//	for (int j = 0; j < width; j++)
+	//	{
+	//		setEmpV(i, j, glm::vec3(1.0f, 0.0f, 0.0f));
+	//	}
+}
 
-	sum /= totalW;
-
-	// Modify values in buffer M0
-	M0.at<Vec3b>(i, j).val[0] = uchar(sum[0] * 255.0f);
-	M0.at<Vec3b>(i, j).val[1] = uchar(sum[1] * 255.0f);
-	M0.at<Vec3b>(i, j).val[2] = uchar(sum[2] * 255.0f);
+void Img::setEmpV(int i, int j, glm::vec3 value)
+{
+	V_e.at<Vec3b>(i, j).val[0] = uchar(value.z * 255.0f);
+	V_e.at<Vec3b>(i, j).val[1] = uchar(value.y * 255.0f);
+	V_e.at<Vec3b>(i, j).val[2] = uchar(value.x * 255.0f);
 }
 
 void Img::filter(Mat& M0, Mat& M1)
@@ -166,6 +165,31 @@ void Img::filter(Mat& M0, Mat& M1)
 		for (int j = 30; j < 35; j++)
 			cout << W[i][j] << endl;
 			*/
+}
+
+void Img::filterPixel(int i, int j, Mat& M0, Mat& M1)
+{
+	float totalW = 0.0f;
+	Vec3f sum(0.0f);
+
+	// Iterate all neighboring patches in buffer M1
+	for (int offset = -r; offset <= r; offset++)
+	{
+		float D = getDistPatch(i, j, i + offset, j + offset, M1);
+		float w = getWeight(D);
+		totalW += w;
+		Vec3b q = M1.at<Vec3b>(i + offset, j + offset);
+		sum[0] += w * float(q.val[0]) / 255.0f;
+		sum[1] += w * float(q.val[1]) / 255.0f;
+		sum[2] += w * float(q.val[2]) / 255.0f;
+	}
+
+	sum /= totalW;
+
+	// Modify values in buffer M0
+	M0.at<Vec3b>(i, j).val[0] = uchar(sum[0] * 255.0f);
+	M0.at<Vec3b>(i, j).val[1] = uchar(sum[1] * 255.0f);
+	M0.at<Vec3b>(i, j).val[2] = uchar(sum[2] * 255.0f);
 }
 
 float Img::getDistPatch(int pi, int pj, int qi, int qj, Mat & M)
@@ -216,11 +240,25 @@ Vec3f Img::getDistPix(int pi, int pj, int qi, int qj, Mat & M)
 	//cout << float(pcolor) << endl;
 }
 
-Vec3f Img::getModDistPix(int pi, int pj, int qi, int qj, float vp, float vq)
+Vec3f Img::getModDistPix(int pi, int pj, int qi, int qj, Mat & M)
 {
-	Vec3f diff = getDistPix(pi, pj, qi, qj, B);
+	Vec3f pvar = V_e.at<Vec3f>(pi, pj);
+	Vec3f qvar = V_e.at<Vec3f>(qi, qj);
 
-	// Later
+	uchar & pb = M.at<Vec3b>(pi, pj).val[0];
+	uchar & qb = M.at<Vec3b>(qi, qj).val[0];
+	float diffb = (float(pb) - float(qb)) / 255.0f;
+	diffb = (diffb - a * (pvar[0] + pvar[0])) / (e + k * k * (pvar[0] + qvar[0]));
 
-	return diff;
+	uchar & pg = M.at<Vec3b>(pi, pj).val[1];
+	uchar & qg = M.at<Vec3b>(qi, qj).val[1];
+	float diffg = (float(pg) - float(qg)) / 255.0f;
+	diffg = (diffg - a * (pvar[1] + pvar[1])) / (e + k * k * (pvar[1] + qvar[1]));
+
+	uchar & pr = M.at<Vec3b>(pi, pj).val[2];
+	uchar & qr = M.at<Vec3b>(qi, qj).val[2];
+	float diffr = (float(pr) - float(qr)) / 255.0f;
+	diffr = (diffr - a * (pvar[2] + pvar[2])) / (e + k * k * (pvar[2] + qvar[2]));
+
+	return Vec3f(diffb * diffb, diffg * diffg, diffr * diffr);
 }

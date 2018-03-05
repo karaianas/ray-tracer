@@ -12,6 +12,8 @@
 #include "Random.h"
 #include "RayTrace.h"
 
+#include "Img.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -35,6 +37,9 @@ public:
 	// Multi-threading
 	void BlockProcess(Scene &s, float scaleX, float scaleY, int counter, vector<glm::vec2> samples);
 
+	// Calculated empirical variance
+	glm::vec3 getVariance(Color & avg, vector<Color>& colors);
+
 private:
 	int XRes, YRes;
 	glm::mat4x4 WorldMatrix;
@@ -50,4 +55,6 @@ public:
 	// Buffers
 	Bitmap* A;
 	Bitmap* B;
+
+	Img* I;
 };

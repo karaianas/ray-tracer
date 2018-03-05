@@ -35,11 +35,12 @@ int main(int argc,char **argv) {
 	
 	//project1();
 	//project2();
-	//project3();
+	
+	project3();
 
 	cout << "Initial path trace complete" << endl;
 	//mthread_test();
-	filter_test();
+	//filter_test();
 
 	cout << "Buffers stored" << endl;
 
@@ -60,8 +61,9 @@ void filter_test()
 	I->setBuffers((char*)a.c_str(), (char*)b.c_str());
 	I->initVarEst();
 	I->Filter(0);
-	I->showImg('a');
-	I->showImg('f');
+	I->showImg('e');
+	//I->showImg('a');
+	//I->showImg('f');
 
 	
 
@@ -155,6 +157,7 @@ void project3()
 	cin >> nx >> ny;
 	cam.SetSuperSample(nx, ny);
 	cam.SetJitter(true);
+
 	//cam.SetShirley(true);
 
 	clock_t t;
