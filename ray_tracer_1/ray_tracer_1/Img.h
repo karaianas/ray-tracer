@@ -38,8 +38,11 @@ private:
 	// Dual buffers
 	Mat A, B;
 
-	// Variance
-	Mat V, V_e;
+	// Diff between A and B
+	Mat V;
+	
+	// Empirical variance
+	Mat V_e;
 
 	// Filtered
 	Mat F;

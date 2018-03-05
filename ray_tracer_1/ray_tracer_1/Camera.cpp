@@ -173,7 +173,7 @@ void Camera::Render(Scene & s)
 		}
 	}
 
-	It->showImg('e');
+	//It->showImg('e');
 	//std::cout << BMP.GetXRes()  << " " << BMP.GetYRes() << " " << BMP.getpix() << std::endl;
 }
 
@@ -285,12 +285,6 @@ glm::vec3 Camera::getVariance(Color & avg, vector<Color>& colors, int mode)
 			bsum += pow(c.Blue - b, 2.0f);
 		}
 	}
-	//for (auto c : colors)
-	//{
-	//	rsum += pow(c.Red - r, 2.0f);
-	//	gsum += pow(c.Green - g, 2.0f);
-	//	bsum += pow(c.Blue - b, 2.0f);
-	//}
 
 	float div = (mode == 0) ? colors.size() : colors.size() / 2.0f;
 	return glm::vec3(rsum, gsum, bsum) / div;

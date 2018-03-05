@@ -109,7 +109,30 @@ void Img::initVarEst()
 	waitKey(0);
 	*/
 
+	//V = A.clone();
 	absdiff(A, B, V);
+	//for (int i = 0; i < height; i++)
+	//{
+	//	for (int j = 0; j < width; j++)
+	//	{
+	//		uchar b = V.at<Vec3b>(i, j).val[0];
+	//		uchar g = V.at<Vec3b>(i, j).val[1];
+	//		uchar r = V.at<Vec3b>(i, j).val[2];
+
+	//		float bf = float(b);
+	//		float gf = float(g);
+	//		float rf = float(r);
+
+	//		bf = bf * bf * 0.5f;
+	//		gf = gf * gf * 0.5f;
+	//		rf = rf * rf * 0.5f;
+
+	//		V.at<Vec3b>(i, j).val[0] = uchar(bf);
+	//		V.at<Vec3b>(i, j).val[1] = uchar(gf);
+	//		V.at<Vec3b>(i, j).val[2] = uchar(rf);
+	//	}
+	//}
+	
 	pow(V, 2, V);
 	V *= 0.5f;
 }
@@ -200,7 +223,7 @@ float Img::getDistPatch(int pi, int pj, int qi, int qj, Mat & M)
 	{
 		for (int dj = -f; dj <= f; dj += 1)
 		{
-			dist += getDistPix(pi + di, pj + dj, qi + di, dj + dj, M);
+			dist += getModDistPix(pi + di, pj + dj, qi + di, dj + dj, M);
 		}
 	}
 
@@ -242,23 +265,51 @@ Vec3f Img::getDistPix(int pi, int pj, int qi, int qj, Mat & M)
 
 Vec3f Img::getModDistPix(int pi, int pj, int qi, int qj, Mat & M)
 {
-	Vec3f pvar = V_e.at<Vec3f>(pi, pj);
-	Vec3f qvar = V_e.at<Vec3f>(qi, qj);
+
+	Vec3b pvar = V.at<Vec3b>(pi, pj);
+	Vec3b qvar = V.at<Vec3b>(qi, qj);
+
+	glm::vec3 pf(float(pvar.val[0]), float(pvar.val[1]), float(pvar.val[2]));
+	glm::vec3 qf(float(qvar.val[0]), float(qvar.val[1]), float(qvar.val[2]));
+	pf /= 255.0f;
+	qf /= 255.0f;
+
+	//if(pf.x > 0)
+	//	cout << pf.x << endl;
+
+	//if(pi > 400 && pj > 400)	
+	//	cout << (float)pvar.val[0] << endl;
 
 	uchar & pb = M.at<Vec3b>(pi, pj).val[0];
 	uchar & qb = M.at<Vec3b>(qi, qj).val[0];
 	float diffb = (float(pb) - float(qb)) / 255.0f;
-	diffb = (diffb - a * (pvar[0] + pvar[0])) / (e + k * k * (pvar[0] + qvar[0]));
+
+	float div = k * k * (pf.x + qf.x);
+	float e_ = 0.0f;
+	if (div < 0.01f)
+		e_ = 0.1f;
+
+	diffb = (diffb*diffb - a * (pf.x + max(pf.x, qf.x))) / (e_ + div);
 
 	uchar & pg = M.at<Vec3b>(pi, pj).val[1];
 	uchar & qg = M.at<Vec3b>(qi, qj).val[1];
 	float diffg = (float(pg) - float(qg)) / 255.0f;
-	diffg = (diffg - a * (pvar[1] + pvar[1])) / (e + k * k * (pvar[1] + qvar[1]));
+
+	div = k * k * (pf.y + qf.y);
+	e_ = 0.0f;
+	if (div < 0.01f)
+		e_ = 0.1f;
+	diffg = (diffg*diffg - a * (pf.y + max(pf.y, qf.y))) / (e_ + div);
 
 	uchar & pr = M.at<Vec3b>(pi, pj).val[2];
 	uchar & qr = M.at<Vec3b>(qi, qj).val[2];
 	float diffr = (float(pr) - float(qr)) / 255.0f;
-	diffr = (diffr - a * (pvar[2] + pvar[2])) / (e + k * k * (pvar[2] + qvar[2]));
 
-	return Vec3f(diffb * diffb, diffg * diffg, diffr * diffr);
+	div = k * k * (pf.z + qf.z);
+	e_ = 0.0f;
+	if (div < 0.01f)
+		e_ = 0.1f;
+	diffr = (diffr*diffr - a * (pf.z + max(pf.z, qf.z))) / (e_ + div);
+
+	return Vec3f(diffb, diffg, diffr);
 }

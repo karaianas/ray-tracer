@@ -36,11 +36,11 @@ int main(int argc,char **argv) {
 	//project1();
 	//project2();
 	
-	project3();
+	//project3();
 
 	cout << "Initial path trace complete" << endl;
 	//mthread_test();
-	//filter_test();
+	filter_test();
 
 	cout << "Buffers stored" << endl;
 
@@ -54,16 +54,18 @@ int main(int argc,char **argv) {
 void filter_test()
 {
 	Img* I = new Img();
-	I->setConstants(1, 3);
+	I->setConstants(1, 5);// 1, 3
+	I->setConstants2(0.5f, 1.0f, 0.45f);
 
 	string a = ".//Result//test_A.bmp";
 	string b = ".//Result//test_B.bmp";
 	I->setBuffers((char*)a.c_str(), (char*)b.c_str());
+
 	I->initVarEst();
 	I->Filter(0);
-	I->showImg('e');
+	I->showImg('v');
 	//I->showImg('a');
-	//I->showImg('f');
+	I->showImg('f');
 
 	
 
