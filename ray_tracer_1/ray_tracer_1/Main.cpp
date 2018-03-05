@@ -16,11 +16,16 @@
 #include "BoxTreeObject.h"
 #include "Random.h"
 
+#include "Img.h"
+
 using namespace std;
 
 void project1();
 void project2();
 void project3();
+
+void filter_test();
+
 void mthread_test();
 void doCalc(int tid);
 
@@ -30,8 +35,9 @@ int main(int argc,char **argv) {
 	
 	//project1();
 	//project2();
-	project3();
+	//project3();
 	//mthread_test();
+	filter_test();
 
 	while (1)
 	{
@@ -40,6 +46,15 @@ int main(int argc,char **argv) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void filter_test()
+{
+	Img* I = new Img();
+	I->setConstants(1, 3);
+	I->readImg();
+	I->getBoundary();
+	I->showImg();
+}
+
 void mthread_test()
 {
 	int numThread = 5;
@@ -82,7 +97,7 @@ void project3()
 	
 	// Load dragon mesh
 	MeshObject dragon;
-	dragon.LoadPLY("dragon.ply");
+	dragon.LoadPLY(".//Models//dragon.ply");
 	
 	// Create box tree
 	BoxTreeObject tree;
@@ -142,7 +157,7 @@ void project3()
 	cout << seconds << " seconds elapsed"<< endl;
 
 	// Save image
-	string name = "test_";
+	string name = ".//Result//test_";
 	name += to_string(nx);
 	name += "by";
 	name += to_string(ny);

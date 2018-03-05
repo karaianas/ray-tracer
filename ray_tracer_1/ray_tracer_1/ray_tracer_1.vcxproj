@@ -139,6 +139,7 @@
     <ClInclude Include="Core.h" />
     <ClInclude Include="DirectLight.h" />
     <ClInclude Include="FresnelMetalMaterial.h" />
+    <ClInclude Include="Img.h" />
     <ClInclude Include="InstanceObject.h" />
     <ClInclude Include="Intersection.h" />
     <ClInclude Include="LambertMaterial.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="DirectLight.cpp" />
     <ClCompile Include="FresnelMetalMaterial.cpp" />
+    <ClCompile Include="Img.cpp" />
     <ClCompile Include="InstanceObject.cpp" />
     <ClCompile Include="LambertMaterial.cpp" />
     <ClCompile Include="Main.cpp" />
