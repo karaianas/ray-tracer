@@ -61,9 +61,6 @@ void Camera::Render(Scene & s)
 		//	auto real_rand = std::bind(std::uniform_real_distribution<double>(0, 1), mt19937(seed));
 		//	test.push_back(float(real_rand()));
 		//}
-
-
-		//for (int i = 0; i < nx * ny * XRes * YRes);
 		
 		#pragma omp parallel
 		for (int y = 0; y < YRes; y++)

@@ -14,23 +14,40 @@ public:
 	Img();
 	
 	void readImg();
-	void showImg();
+	void showImg(char c);
 
-	void filterPixel(int i, int j, Mat & A, Mat & B);
-	void filter();
+	void setBuffers(const char* filepathA, const char* filepathB);
+	void initVarEst();
 
-	float getWeight(float patchDist) { return exp(-1.0f * max(0.0f, patchDist)); };
+	void Filter(int mode);
+	void filter(Mat& M0, Mat& M1);
+	void filterPixel(int i, int j, Mat& M0, Mat& M1);
 	
-	float getDistPatch(int pi, int pj, int qi, int qj);
-	Vec3f getDistPix(int pi, int pj, int qi, int qj);
+	float getDistPatch(int pi, int pj, int qi, int qj, Mat & M);
+	Vec3f getDistPix(int pi, int pj, int qi, int qj, Mat & M);
 	Vec3f getModDistPix(int pi, int pj, int qi, int qj, float vp, float vq);
 
+	float getWeight(float patchDist) { return exp(-1.0f * max(0.0f, patchDist)); };
 	void setConstants(int r_, int f_) { r = r_; f = f_; };
 	void setConstants2(float a_, float e_, float k_) { a = a_; e = e_; k = k_; };
 
 private:
-	Mat I;
+
+	// Dual buffers
+	Mat A, B;
+
+	// Variance
+	Mat V;
+
+	// Filtered
+	Mat F;
+
+	// Constants
 	int r, f;
 	float a, e, k;
+
+	// Weight
 	float** W;
+
+	int width, height;
 };
