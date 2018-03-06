@@ -120,9 +120,13 @@ void Img::computeError()
 	cout << "Error map constructed" << endl;
 	Mat combined;
 	add(E_a, E_b, combined);
-	normalize(combined, combined, 0, 1, NORM_MINMAX);
+
+	Mat result;
+	GaussianBlur(combined, result, Size(3, 3), 0.8);
+	normalize(result, result, 0, 1, NORM_MINMAX);
 	namedWindow("Error map", CV_WINDOW_AUTOSIZE);
-	imshow("Error map", 255 * combined);
+	imshow("Error map", 255 * result);
+	//imwrite("D://Github//temp//weightedError.png", combined);
 	waitKey(0);
 }
 
