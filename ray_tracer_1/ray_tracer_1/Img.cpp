@@ -55,27 +55,75 @@ void Img::showImg(char c)
 	}
 	else if (c == 'e')
 	{
-		//F_v *= 100.0f;
-		//cout << height << endl;
-		//cout << W_a.cols << " " << W_a.rows << endl;
 		Mat dst = W_a.clone();
 		normalize(W_a, dst, 0, 1, NORM_MINMAX);
-		//cout << dst.cols << " " << dst.rows << endl;
 		namedWindow("Computed Variance", CV_WINDOW_AUTOSIZE);
-		//resizeWindow("Computed Variance", height, width);
 		imshow("Computed Variance", dst);
-		imwrite("D://Github//temp//Result//wth.png", 255* dst);
+		//imwrite("D://Github//temp//Result//wth.png", 255* dst);
 	}
 
 	waitKey(0);
 }
 
-void Img::computeError(int mode)
+void Img::computeError()
 {
-	if (mode == 0)
-	{
+	P = Mat(height, width, CV_32FC1, 4.0);
 
+	Mat dE;
+	absdiff(A, B, dE);
+
+	Mat E_a(height, width, CV_32FC1, 0.0);
+	Mat E_b(height, width, CV_32FC1, 0.0);
+
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			float b = float(dE.at<Vec3b>(i, j).val[0]) / 255.0f;
+			float g = float(dE.at<Vec3b>(i, j).val[1]) / 255.0f;
+			float r = float(dE.at<Vec3b>(i, j).val[2]) / 255.0f;
+
+			float ba = float(A.at<Vec3b>(i, j).val[0]) / 255.0f;
+			float ga = float(A.at<Vec3b>(i, j).val[1]) / 255.0f;
+			float ra = float(A.at<Vec3b>(i, j).val[2]) / 255.0f;
+
+			float bb = float(B.at<Vec3b>(i, j).val[0]) / 255.0f;
+			float gb = float(B.at<Vec3b>(i, j).val[1]) / 255.0f;
+			float rb = float(B.at<Vec3b>(i, j).val[2]) / 255.0f;
+
+			float error = b*b + g*g + r*r;
+
+			//if (i > 900 && j > 1200)
+				//cout << error << endl;
+				//cout << b << " " << g << " " << r << endl;
+			// Error map for A
+			float e_a = ba*ba + ga*ga + ra*ra;
+			if (e_a < 0.000001f)
+				e_a = error;
+			else
+				e_a = error / e_a;
+
+			E_a.at<float>(i, j) = e_a * W_a.at<float>(i, j) /( 1 + P.at<float>(i, j));
+			//if (i > 900 && j > 1200)
+			//	cout << e_a * W_a.at<float>(i, j) / (1 + P.at<float>(i, j)) << endl;
+
+			// Error map for B
+			float e_b = bb*bb + gb*gb + rb*rb;
+			if (e_b < 0.000001f)
+				e_b = error;
+			else
+				e_b = error / e_b;
+			E_b.at<float>(i, j) = e_b * W_b.at<float>(i, j) /(1 + P.at<float>(i, j));
+		}
 	}
+
+	cout << "Error map constructed" << endl;
+	Mat combined;
+	add(E_a, E_b, combined);
+	normalize(combined, combined, 0, 1, NORM_MINMAX);
+	namedWindow("Error map", CV_WINDOW_AUTOSIZE);
+	imshow("Error map", 255 * combined);
+	waitKey(0);
 }
 
 void Img::setBuffers(const char * filepathA, const char * filepathB)

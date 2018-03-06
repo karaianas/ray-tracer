@@ -87,8 +87,8 @@ void filter_test()
 
 	//I->showImg('a');
 	//I->showImg('c');
-	I->showImg('e');
-
+	//I->showImg('e');
+	I->computeError();
 }
 
 void mthread_test()

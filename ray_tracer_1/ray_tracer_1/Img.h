@@ -17,7 +17,7 @@ public:
 	void showImg(char c);
 
 	void setInitSPP(int num);
-	void computeError(int mode);
+	void computeError();
 
 	void setBuffers(const char* filepathA, const char* filepathB);
 	void initVarEst();
@@ -69,6 +69,9 @@ private:
 	// Weight
 	//float** W;
 	Mat W_a, W_b;
+
+	// Number of pixels
+	Mat P;
 
 	int width, height;
 };
