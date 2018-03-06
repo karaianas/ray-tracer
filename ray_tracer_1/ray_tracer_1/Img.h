@@ -16,6 +16,9 @@ public:
 	void readImg();
 	void showImg(char c);
 
+	void setInitSPP(int num);
+	void computeError(int mode);
+
 	void setBuffers(const char* filepathA, const char* filepathB);
 	void initVarEst();
 	void empVar(int h, int w);
@@ -29,7 +32,7 @@ public:
 
 	void Filter(int mode);
 	void filter(Mat& M0, Mat& M1, int mode);
-	void filterPixel(int i, int j, Mat& M0, Mat& M1, int mode);
+	float filterPixel(int i, int j, Mat& M0, Mat& M1, int mode);
 	
 	float getDistPatch(int pi, int pj, int qi, int qj, Mat & M, int mode);
 	Vec3f getDistPix(int pi, int pj, int qi, int qj, Mat & M);
@@ -64,7 +67,8 @@ private:
 	float a, e, k;
 
 	// Weight
-	float** W;
+	//float** W;
+	Mat W_a, W_b;
 
 	int width, height;
 };

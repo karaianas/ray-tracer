@@ -47,6 +47,7 @@ int main(int argc,char **argv)
 
 	// Variance filter
 	filter_test();
+	//I->readImg();
 
 	cout << "Variance filtered" << endl;
 
@@ -68,8 +69,8 @@ void filter_test()
 	//I->showImg('e');
 
 	// (2) Set image buffers
-	string a = ".//Result//test_A.bmp";
-	string b = ".//Result//test_B.bmp";
+	string a = "D://Github//temp//test_A.bmp";
+	string b = "D://Github//temp//test_B.bmp";
 	I->setBuffers((char*)a.c_str(), (char*)b.c_str());
 
 	// (3) Filter variances
@@ -77,7 +78,7 @@ void filter_test()
 	I->setConstants2(4.0f, 1.0f, 0.45f);
 	I->initVarEst();
 	I->Filter(1);
-	I->showImg('e');
+	//I->showImg('e');
 
 	// (4) Filter images
 	I->setConstants(1, 3);// 1, 3
@@ -85,7 +86,8 @@ void filter_test()
 	I->Filter(0);
 
 	//I->showImg('a');
-	I->showImg('f');
+	//I->showImg('c');
+	I->showImg('e');
 
 }
 
@@ -193,7 +195,7 @@ void project3()
 	cout << seconds << " seconds elapsed"<< endl;
 
 	// Save image
-	string name = ".//Result//test_";
+	string name = "D://Github//temp//test_";
 	name += to_string(nx);
 	name += "by";
 	name += to_string(ny);
@@ -202,9 +204,9 @@ void project3()
 	name += ".bmp";
 	cam.SaveBitmap((char*)name.c_str());
 
-	string nameA = ".//Result//test_A.bmp";
+	string nameA = "D://Github//temp//test_A.bmp";
 	cam.A->SaveBMP((char*)nameA.c_str());
-	string nameB = ".//Result//test_B.bmp";
+	string nameB = "D://Github//temp//test_B.bmp";
 	cam.B->SaveBMP((char*)nameB.c_str());
 }
 

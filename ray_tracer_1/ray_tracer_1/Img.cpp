@@ -9,19 +9,9 @@ Img::Img()
 
 void Img::readImg()
 {
-	//I = imread(".//Images//cat.jpg");
-
-	//W = new float*[I.rows];
-	//for (int i = 0; i < I.rows; i++)
-	//	W[i] = new float[I.cols];
-
-	//#pragma omp parallel
-	//for(int i = 0; i < I.rows; i++)
-	//	#pragma omp for schedule(dynamic,1)
-	//	for (int j = 0; j < I.cols; j++)
-	//	{
-	//		W[i][j] = 0.0f;
-	//	}
+	// Testing error map
+	//Mat T(2, 2, CV_64FC1, 0.0);
+	//cout << T.at<double>(0, 0) << endl;
 }
 
 void Img::showImg(char c)
@@ -51,7 +41,7 @@ void Img::showImg(char c)
 		absdiff(F_a, F_b, M);
 		namedWindow("Filtered", CV_WINDOW_AUTOSIZE);
 		imshow("Filtered", M);
-		imwrite(".//FilteredVarResult.png", M);
+		imwrite("D://Github//temp//FilteredVarResult.png", M);
 	}
 	else if (c == 'g')
 	{
@@ -66,11 +56,26 @@ void Img::showImg(char c)
 	else if (c == 'e')
 	{
 		//F_v *= 100.0f;
+		//cout << height << endl;
+		//cout << W_a.cols << " " << W_a.rows << endl;
+		Mat dst = W_a.clone();
+		normalize(W_a, dst, 0, 1, NORM_MINMAX);
+		//cout << dst.cols << " " << dst.rows << endl;
 		namedWindow("Computed Variance", CV_WINDOW_AUTOSIZE);
-		imshow("Computed Variance", F_v);
+		//resizeWindow("Computed Variance", height, width);
+		imshow("Computed Variance", dst);
+		imwrite("D://Github//temp//Result//wth.png", 255* dst);
 	}
 
 	waitKey(0);
+}
+
+void Img::computeError(int mode)
+{
+	if (mode == 0)
+	{
+
+	}
 }
 
 void Img::setBuffers(const char * filepathA, const char * filepathB)
@@ -80,19 +85,6 @@ void Img::setBuffers(const char * filepathA, const char * filepathB)
 
 	width = A.cols;
 	height = A.rows;
-
-	// Set weights
-	W = new float*[height];
-	for (int i = 0; i < height; i++)
-		W[i] = new float[width];
-
-#pragma omp parallel
-	for (int i = 0; i < height; i++)
-#pragma omp for schedule(dynamic,1)
-		for (int j = 0; j < width; j++)
-		{
-			W[i][j] = 0.0f;
-		}
 }
 
 void Img::Filter(int mode)
@@ -100,10 +92,7 @@ void Img::Filter(int mode)
 	if (mode == 0)
 		filter(A, B, mode);
 	else
-	{
-		// Filter variance
 		filter(V, V_e, mode);
-	}
 }
 
 void Img::initVarEst()
@@ -190,8 +179,10 @@ void Img::filter(Mat& M0, Mat& M1, int mode)
 
 	if (mode == 0)
 	{
-		F_a = M0.clone();//Mat(2, 2, CV_8UC3, Scalar(0, 0, 0));
+		F_a = M0.clone();
 		F_b = M1.clone();
+		W_a = Mat(height, width, CV_32FC1, 0.0);
+		W_b = Mat(height, width, CV_32FC1, 0.0);
 	}
 	else
 		F_v = M0.clone();
@@ -205,8 +196,11 @@ void Img::filter(Mat& M0, Mat& M1, int mode)
 			// Filter each pixel
 			if (mode == 0)
 			{
-				filterPixel(i, j, F_a, M1, mode);
-				filterPixel(i, j, F_b, M0, mode);
+				float w_a = filterPixel(i, j, F_a, M1, mode);
+				float w_b = filterPixel(i, j, F_b, M0, mode);
+				//if (i > 900 && j > 1200)
+				W_a.at<float>(i, j) = w_a;
+				W_b.at<float>(i, j) = w_b;
 			}
 			else
 				filterPixel(i, j, F_v, M1, mode);
@@ -217,28 +211,14 @@ void Img::filter(Mat& M0, Mat& M1, int mode)
 	if (mode == 0)
 	{
 		combineBuffers(F_a, F_b);
-		imwrite(".//Result//test_result.png", C);
+		imwrite("D://Github//temp//test_result.png", C);
 	}
 	else
-		imwrite(".//Result//test_result_V.png", F_v);
+		imwrite("D://Github//temp//test_result_V.png", F_v);
 
-	/*
-	// Average weights
-	#pragma omp parallel
-	for (int i = 0; i < I.rows; i++)
-		#pragma omp for schedule(dynamic,1)
-		for (int j = 0; j < I.cols; j++)
-		{
-			W[i][j] /= pow((2 * f + 1), 2.0f);
-		}
-
-	for (int i = 30; i < 35; i++)
-		for (int j = 30; j < 35; j++)
-			cout << W[i][j] << endl;
-			*/
 }
 
-void Img::filterPixel(int i, int j, Mat& M0, Mat& M1, int mode)
+float Img::filterPixel(int i, int j, Mat& M0, Mat& M1, int mode)
 {
 	float totalW = 0.0f;
 	Vec3f sum(0.0f);
@@ -263,6 +243,8 @@ void Img::filterPixel(int i, int j, Mat& M0, Mat& M1, int mode)
 	M0.at<Vec3b>(i, j).val[0] = uchar(sum[0] * 255.0f);
 	M0.at<Vec3b>(i, j).val[1] = uchar(sum[1] * 255.0f);
 	M0.at<Vec3b>(i, j).val[2] = uchar(sum[2] * 255.0f);
+
+	return totalW;
 }
 
 float Img::getDistPatch(int pi, int pj, int qi, int qj, Mat & M, int mode)
@@ -274,24 +256,14 @@ float Img::getDistPatch(int pi, int pj, int qi, int qj, Mat & M, int mode)
 		for (int dj = -f; dj <= f; dj += 1)
 		{
 			if(mode == 0)	
-				dist += getModDistPix(pi + di, pj + dj, qi + di, dj + dj, M);
+				dist += getModDistPix(pi + di, pj + dj, qi + di, qj + dj, M);
 			else
-				dist += getModDistPix2(pi + di, pj + dj, qi + di, dj + dj, M);
+				dist += getModDistPix2(pi + di, pj + dj, qi + di, qj + dj, M);
 		}
 	}
 
 	float D = dist[0] + dist[1] + dist[2];
 	D /= float(3 * pow(2 * f + 1, 2));
-
-	// Weight all pixels within the patch P as w
-	//float w = getWeight(D);
-	//for (int di = -f; di <= f; di += 1)
-	//{
-	//	for (int dj = -f; dj <= f; dj += 1)
-	//	{
-	//		W[pi + di][pj + dj] += w;
-	//	}
-	//}
 
 	return D;
 }
@@ -311,9 +283,6 @@ Vec3f Img::getDistPix(int pi, int pj, int qi, int qj, Mat & M)
 	float diffr = (float(pr) - float(qr)) / 255.0f;
 
 	return Vec3f(diffb * diffb, diffg * diffg, diffr * diffr);
-
-	//printf("%u ", pcolor);
-	//cout << float(pcolor) << endl;
 }
 
 Vec3f Img::getModDistPix(int pi, int pj, int qi, int qj, Mat & M)
@@ -411,7 +380,7 @@ Vec3f Img::getModDistPix2(int pi, int pj, int qi, int qj, Mat & M)
 	float diffb = (float(pb) - float(qb)) / 255.0f;
 
 	float div = k * k * (pf.x + qf.x);
-	if (div < 0.1f)
+	if (div < 0.01f)//0.1f
 		diffb = (diffb*diffb);
 	else
 		diffb = (diffb*diffb - a * (pf.x + max(pf.x, qf.x))) / (div);
@@ -421,7 +390,7 @@ Vec3f Img::getModDistPix2(int pi, int pj, int qi, int qj, Mat & M)
 	float diffg = (float(pg) - float(qg)) / 255.0f;
 
 	div = k * k * (pf.y + qf.y);
-	if (div < 0.1f)
+	if (div < 0.01f)
 		diffg = (diffg*diffg);
 	else
 		diffg = (diffg*diffg - a * (pf.y + max(pf.y, qf.y))) / (div);
@@ -431,7 +400,7 @@ Vec3f Img::getModDistPix2(int pi, int pj, int qi, int qj, Mat & M)
 	float diffr = (float(pr) - float(qr)) / 255.0f;
 
 	div = k * k * (pf.z + qf.z);
-	if (div < 0.1f)
+	if (div < 0.01f)
 		diffr = (diffr*diffr);
 	else
 		diffr = (diffr*diffr - a * (pf.z + max(pf.z, qf.z))) / (div);
