@@ -85,7 +85,7 @@ void filter_test()
 	I->Filter(0);
 
 	//I->showImg('a');
-	I->showImg('c');
+	I->showImg('f');
 
 }
 

@@ -47,8 +47,11 @@ void Img::showImg(char c)
 	// Filtered
 	else if (c == 'f')
 	{
+		Mat M;
+		absdiff(F_a, F_b, M);
 		namedWindow("Filtered", CV_WINDOW_AUTOSIZE);
-		imshow("Filtered", F_a);
+		imshow("Filtered", M);
+		imwrite(".//FilteredVarResult.png", M);
 	}
 	else if (c == 'g')
 	{
