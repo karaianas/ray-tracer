@@ -20,6 +20,9 @@
 
 using namespace std;
 
+Img* I;
+Camera cam;
+
 void project1();
 void project2();
 void project3();
@@ -31,18 +34,21 @@ void doCalc(int tid);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int main(int argc,char **argv) {
-	
+int main(int argc,char **argv) 
+{
+	I = new Img();
 	//project1();
 	//project2();
 	
-	//project3();
+	project3();
 
 	cout << "Initial path trace complete" << endl;
 	//mthread_test();
+
+	// Variance filter
 	filter_test();
 
-	cout << "Buffers stored" << endl;
+	cout << "Variance filtered" << endl;
 
 	while (1)
 	{
@@ -53,21 +59,33 @@ int main(int argc,char **argv) {
 ////////////////////////////////////////////////////////////////////////////////
 void filter_test()
 {
-	Img* I = new Img();
-	I->setConstants(1, 5);// 1, 3
-	I->setConstants2(0.5f, 1.0f, 0.45f);
 
+	// (1) Set empirical variances
+	I->setVbuffer(cam.It->getEmpV(), 2);
+	I->setVbuffer(cam.Ia->getEmpV(), 0);
+	I->setVbuffer(cam.Ib->getEmpV(), 1);
+	I->setDiffVbuffer();
+	//I->showImg('e');
+
+	// (2) Set image buffers
 	string a = ".//Result//test_A.bmp";
 	string b = ".//Result//test_B.bmp";
 	I->setBuffers((char*)a.c_str(), (char*)b.c_str());
 
+	// (3) Filter variances
+	I->setConstants(1, 3);// 1, 3
+	I->setConstants2(4.0f, 1.0f, 0.45f);
 	I->initVarEst();
-	I->Filter(0);
-	I->showImg('v');
-	//I->showImg('a');
-	I->showImg('f');
+	I->Filter(1);
+	I->showImg('e');
 
-	
+	// (4) Filter images
+	I->setConstants(1, 3);// 1, 3
+	I->setConstants2(0.5f, 1.0f, 0.45f);
+	I->Filter(0);
+
+	//I->showImg('a');
+	I->showImg('c');
 
 }
 
@@ -147,8 +165,9 @@ void project3()
 	scn.AddLight(sunlgt);
 	
 	// Create camera
-	Camera cam;
-	cam.SetResolution(640, 480);
+	//Camera cam; 
+	//cam.SetResolution(640, 480);
+	cam.SetResolution(1280, 960);
 	cam.SetAspect(1.33f);
 	cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
 	//cam.LookAt(glm::vec3(-0.2f, 0.08f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
@@ -187,10 +206,6 @@ void project3()
 	cam.A->SaveBMP((char*)nameA.c_str());
 	string nameB = ".//Result//test_B.bmp";
 	cam.B->SaveBMP((char*)nameB.c_str());
-
-	//while (1)
-	//{
-	//}
 }
 
 void project2()

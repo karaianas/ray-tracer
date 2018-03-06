@@ -173,6 +173,7 @@ void Camera::Render(Scene & s)
 		}
 	}
 
+	
 	//It->showImg('e');
 	//std::cout << BMP.GetXRes()  << " " << BMP.GetYRes() << " " << BMP.getpix() << std::endl;
 }
