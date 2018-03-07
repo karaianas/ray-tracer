@@ -22,18 +22,6 @@ void Camera::SetResolution(int x, int y)
 	YRes = y;
 	BMP = new Bitmap(x, y);
 
-	A = new Bitmap(x, y);
-	B = new Bitmap(x, y);
-
-	Ia = new Img();
-	Ia->empVar(YRes, XRes);
-
-	Ib = new Img();
-	Ib->empVar(YRes, XRes);
-
-	It = new Img();
-	It->empVar(YRes, XRes);
-
 	//std::cout << BMP->GetXRes() << " " << BMP->GetYRes() << std::endl;
 }
 
@@ -123,19 +111,15 @@ void Camera::Render(Scene & s)
 
 					}
 
+					a.Scale(2.0f / float(nx * ny));
+					b.Scale(2.0f / float(nx * ny));
 					c.Scale(1.0f / float(nx * ny));
 					BMP->SetPixel(x, y, c.ToInt());
 
-					a.Scale(2.0f / float(nx * ny));
-					A->SetPixel(x, y, a.ToInt());
-
-					b.Scale(2.0f / float(nx * ny));
-					B->SetPixel(x, y, b.ToInt());
-
 					// Need to calculate empirical variances here
-					It->setEmpV(YRes - y, x, getVariance(c, tcolors, 0));
-					Ia->setEmpV(YRes - y, x, getVariance(a, tcolors, 1));
-					Ib->setEmpV(YRes - y, x, getVariance(b, tcolors, 2));
+					I->sendToV(YRes - y, x, getVariance(c, tcolors, 0));
+					I->sendToA(YRes - y, x, getVariance(a, tcolors, 1), glm::vec3(a.Red, a.Green, a.Blue));
+					I->sendToB(YRes - y, x, getVariance(b, tcolors, 2), glm::vec3(b.Red, b.Green, b.Blue));
 				}
 			}
 		}
@@ -172,10 +156,6 @@ void Camera::Render(Scene & s)
 			}
 		}
 	}
-
-	
-	//It->showImg('e');
-	//std::cout << BMP.GetXRes()  << " " << BMP.GetYRes() << " " << BMP.getpix() << std::endl;
 }
 
 void Camera::SaveBitmap(char * filename)

@@ -53,11 +53,5 @@ private:
 
 public:
 	// Buffers
-	Bitmap* A;
-	Bitmap* B;
-
-	Img* Ia;
-	Img* Ib;
-	Img* It;
 	Img* I;
 };

@@ -4,6 +4,7 @@
 
 #include "Core.h"
 
+// Path tracing
 #include "MeshObject.h"
 #include "InstanceObject.h"
 #include "Camera.h"
@@ -16,12 +17,15 @@
 #include "BoxTreeObject.h"
 #include "Random.h"
 
+// Image processing
 #include "Img.h"
 
 using namespace std;
 
 Img* I;
 Camera cam;
+int height = 960;
+int width = 1280;
 
 void project1();
 void project2();
@@ -29,25 +33,19 @@ void project3();
 
 void filter_test();
 
-void mthread_test();
-void doCalc(int tid);
-
 ////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc,char **argv) 
 {
-	I = new Img();
-	//project1();
-	//project2();
+	I = new Img(height, width);
 	
+	// Initial path tracing
+	cout << "Path tracing started..." << endl;
 	project3();
+	cout << "Initial path tracing complete." << endl;
 
-	cout << "Initial path trace complete" << endl;
-	//mthread_test();
-
-	// Variance filter
+	// Filtering
 	filter_test();
-	//I->readImg();
 
 	cout << "Variance filtered" << endl;
 
@@ -60,62 +58,18 @@ int main(int argc,char **argv)
 ////////////////////////////////////////////////////////////////////////////////
 void filter_test()
 {
-
-	// (1) Set empirical variances
-	I->setVbuffer(cam.It->getEmpV(), 2);
-	I->setVbuffer(cam.Ia->getEmpV(), 0);
-	I->setVbuffer(cam.Ib->getEmpV(), 1);
-	I->setDiffVbuffer();
-	//I->showImg('e');
-
-	// (2) Set image buffers
-	string a = "D://Github//temp//test_A.bmp";
-	string b = "D://Github//temp//test_B.bmp";
-	I->setBuffers((char*)a.c_str(), (char*)b.c_str());
-
-	// (3) Filter variances
+	// (1) Filter variances
 	I->setConstants(1, 3);// 1, 3
 	I->setConstants2(4.0f, 1.0f, 0.45f);
-	I->initVarEst();
 	I->Filter(1);
-	//I->showImg('e');
 
-	// (4) Filter images
-	I->setConstants(1, 3);// 1, 3
+	// (2) Filter images
+	I->setConstants(3, 3);// 1, 3 smaller gives sharper
 	I->setConstants2(0.5f, 1.0f, 0.45f);
 	I->Filter(0);
 
-	//I->showImg('a');
-	//I->showImg('c');
-	//I->showImg('e');
+	// (3) Compute error
 	I->computeError();
-}
-
-void mthread_test()
-{
-	int numThread = 5;
-	thread* threadArray = new thread[numThread - 1];
-	for (int i = 0; i < numThread - 1; i++)
-	{
-		threadArray[i] = thread(doCalc, i);
-	}
-
-	// Once they are finished, they are joined with the main thread
-	for (int i = 0; i < numThread - 1; i++)
-	{
-		threadArray[i].join();
-	}
-}
-
-void doCalc(int tid)
-{
-	int x = 4;
-
-	for (int i = 0; i < 10; i++)
-	{
-		x *= pow(x, i);
-	}
-	cout << tid << endl;
 }
 
 void project3()
@@ -169,7 +123,7 @@ void project3()
 	// Create camera
 	//Camera cam; 
 	//cam.SetResolution(640, 480);
-	cam.SetResolution(1280, 960);
+	cam.SetResolution(width, height);
 	cam.SetAspect(1.33f);
 	cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
 	//cam.LookAt(glm::vec3(-0.2f, 0.08f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
@@ -180,8 +134,10 @@ void project3()
 	cin >> nx >> ny;
 	cam.SetSuperSample(nx, ny);
 	cam.SetJitter(true);
-
 	//cam.SetShirley(true);
+	
+	// Filter test
+	cam.I = I;
 
 	clock_t t;
 	t = clock();
@@ -203,11 +159,6 @@ void project3()
 	name += to_string(seconds);
 	name += ".bmp";
 	cam.SaveBitmap((char*)name.c_str());
-
-	string nameA = "D://Github//temp//test_A.bmp";
-	cam.A->SaveBMP((char*)nameA.c_str());
-	string nameB = "D://Github//temp//test_B.bmp";
-	cam.B->SaveBMP((char*)nameB.c_str());
 }
 
 void project2()

@@ -11,33 +11,32 @@ using namespace std;
 
 class Img {
 public:
-	Img();
-	
-	void readImg();
-	void showImg(char c);
+	Img(int h, int w);
 
-	void setInitSPP(int num);
-	void computeError();
+	// Image manipulation
+	void displayImg(Mat & M, bool isNorm, bool isScale);
+	void saveImg(string filename, Mat & M);
 
-	void setBuffers(const char* filepathA, const char* filepathB);
+	// Information from path tracer
+	void sendToA(int i, int j, glm::vec3 variance, glm::vec3 color);
+	void sendToB(int i, int j, glm::vec3 variance, glm::vec3 color);
+	void sendToV(int i, int j, glm::vec3 variance);
+
+	// Variance computation
 	void initVarEst();
-	void empVar(int h, int w);
-	void setEmpV(int i, int j, glm::vec3 value);
 
-	Mat& getEmpV() { return V_e; };
-	void setVbuffer(Mat & M, int mode);
-	void setDiffVbuffer() {absdiff(V_a, V_b, V_d);};
-
+	// Post processing
+	void computeError();
 	void combineBuffers(Mat & M0, Mat & M1);
 
+	// Filtering
 	void Filter(int mode);
 	void filter(Mat& M0, Mat& M1, int mode);
 	float filterPixel(int i, int j, Mat& M0, Mat& M1, int mode);
 	
 	float getDistPatch(int pi, int pj, int qi, int qj, Mat & M, int mode);
 	Vec3f getDistPix(int pi, int pj, int qi, int qj, Mat & M);
-	Vec3f getModDistPix(int pi, int pj, int qi, int qj, Mat & M);
-	Vec3f getModDistPix2(int pi, int pj, int qi, int qj, Mat & M);
+	Vec3f getModDistPix(int pi, int pj, int qi, int qj, Mat & M, int mode);
 
 	float getWeight(float patchDist) { return exp(-1.0f * max(0.0f, patchDist)); };
 	void setConstants(int r_, int f_) { r = r_; f = f_; };
@@ -46,15 +45,11 @@ public:
 private:
 
 	// Dual image buffers
-	Mat A, B;
-
-	// Sqrd Diff between A and B
-	Mat V;
+	Mat A, B, V;
 	
 	// Empirical variance
 	Mat V_e;
-	Mat V_a, V_b;
-	Mat V_d;
+	Mat V_a, V_b, V_d;
 
 	// Cross-filtered result
 	Mat F_a, F_b, F_v;
@@ -67,10 +62,9 @@ private:
 	float a, e, k;
 
 	// Weight
-	//float** W;
 	Mat W_a, W_b;
 
-	// Number of pixels
+	// Number of samples per pixel
 	Mat P;
 
 	int width, height;
