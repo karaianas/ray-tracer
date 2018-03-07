@@ -24,8 +24,8 @@ using namespace std;
 
 Img* I;
 Camera cam;
-int height = 960;
-int width = 1280;
+int height = 1024;// 960;
+int width = 1024;//1280
 
 void project1();
 void project2();
@@ -60,12 +60,13 @@ void filter_test()
 {
 	// (1) Filter variances
 	I->setConstants(1, 3);// 1, 3
-	I->setConstants2(4.0f, 1.0f, 0.45f);
+	I->setConstants2(4.0f, 1.0f, 0.45f * 0.45f);
 	I->Filter(1);
 
 	// (2) Filter images
-	I->setConstants(5, 3);// 1, 3 smaller gives sharper
-	I->setConstants2(0.5f, 1.0f, 0.45f);
+	// (3, 1) works best for 4by4
+	I->setConstants(3, 1);// (7, 3) in the original paper
+	I->setConstants2(0.5f, 1.0f, 0.45f * 0.45f);
 	I->Filter(0);
 
 	// (3) Compute error
@@ -124,9 +125,10 @@ void project3()
 	//Camera cam; 
 	//cam.SetResolution(640, 480);
 	cam.SetResolution(width, height);
-	cam.SetAspect(1.33f);
-	cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
-	//cam.LookAt(glm::vec3(-0.2f, 0.08f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
+	//cam.SetAspect(1.33f);
+	cam.SetAspect(float(width)/(float)height);
+	//cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
+	cam.LookAt(1.3f *glm::vec3(-0.5f, 0.15f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
 	cam.SetFOV(40.0f);
 	
 	int nx, ny;

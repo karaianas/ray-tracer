@@ -39,7 +39,9 @@ public:
 	Vec3f getModDistPix(int pi, int pj, int qi, int qj, Mat & M, int mode);
 
 	float getWeight(float patchDist) { return exp(-1.0f * max(0.0f, patchDist)); };
-	void setConstants(int r_, int f_) { r = r_; f = f_; };
+	void setConstants(int r_, int f_) {
+		r = r_; f = f_; normc = float(3 * pow(2 * f + 1, 2));
+	};
 	void setConstants2(float a_, float e_, float k_) { a = a_; e = e_; k = k_; };
 
 private:
@@ -68,4 +70,6 @@ private:
 	Mat P;
 
 	int width, height;
+
+	float normc;
 };

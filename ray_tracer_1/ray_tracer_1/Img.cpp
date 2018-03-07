@@ -1,5 +1,7 @@
 #include "Img.h"
 
+#define sfactor 0.00392156862f
+
 using namespace cv;
 using namespace std;
 
@@ -11,7 +13,7 @@ Img::Img(int h, int w)
 	V_e = Mat(height, width, CV_8UC3, Scalar(0, 0, 0));
 	V_a = Mat(height, width, CV_8UC3, Scalar(0, 0, 0));
 	V_b = Mat(height, width, CV_8UC3, Scalar(0, 0, 0));
-	P = Mat(height, width, CV_32FC1, 4.0);
+	P = Mat(height, width, CV_32SC1, 4);
 	A = Mat(height, width, CV_8UC3, Scalar(0, 0, 0));
 	B = Mat(height, width, CV_8UC3, Scalar(0, 0, 0));
 }
@@ -75,9 +77,9 @@ void Img::initVarEst()
 			uchar g = V.at<Vec3b>(i, j).val[1];
 			uchar r = V.at<Vec3b>(i, j).val[2];
 
-			float bf = float(b) / 255.0f;
-			float gf = float(g) / 255.0f;
-			float rf = float(r) / 255.0f;
+			float bf = float(b) * sfactor;
+			float gf = float(g) * sfactor;
+			float rf = float(r) * sfactor;
 
 			bf = bf * bf * 0.5f;
 			gf = gf * gf * 0.5f;
@@ -105,17 +107,17 @@ void Img::computeError()
 	{
 		for (int j = 0; j < width; j++)
 		{
-			float b = float(dE.at<Vec3b>(i, j).val[0]) / 255.0f;
-			float g = float(dE.at<Vec3b>(i, j).val[1]) / 255.0f;
-			float r = float(dE.at<Vec3b>(i, j).val[2]) / 255.0f;
+			float b = float(dE.at<Vec3b>(i, j).val[0]) * sfactor;
+			float g = float(dE.at<Vec3b>(i, j).val[1]) * sfactor;
+			float r = float(dE.at<Vec3b>(i, j).val[2]) * sfactor;
 
-			float ba = float(A.at<Vec3b>(i, j).val[0]) / 255.0f;
-			float ga = float(A.at<Vec3b>(i, j).val[1]) / 255.0f;
-			float ra = float(A.at<Vec3b>(i, j).val[2]) / 255.0f;
+			float ba = float(A.at<Vec3b>(i, j).val[0]) * sfactor;
+			float ga = float(A.at<Vec3b>(i, j).val[1]) * sfactor;
+			float ra = float(A.at<Vec3b>(i, j).val[2]) * sfactor;
 
-			float bb = float(B.at<Vec3b>(i, j).val[0]) / 255.0f;
-			float gb = float(B.at<Vec3b>(i, j).val[1]) / 255.0f;
-			float rb = float(B.at<Vec3b>(i, j).val[2]) / 255.0f;
+			float bb = float(B.at<Vec3b>(i, j).val[0]) * sfactor;
+			float gb = float(B.at<Vec3b>(i, j).val[1]) * sfactor;
+			float rb = float(B.at<Vec3b>(i, j).val[2]) * sfactor;
 
 			float error = b*b + g*g + r*r;
 
@@ -126,7 +128,7 @@ void Img::computeError()
 			else
 				e_a = error / e_a;
 
-			E_a.at<float>(i, j) = e_a * W_a.at<float>(i, j) /( 1 + P.at<float>(i, j));
+			E_a.at<float>(i, j) = e_a * W_a.at<float>(i, j) /( 1 + P.at<int>(i, j));
 
 			// Error map for B
 			float e_b = bb*bb + gb*gb + rb*rb;
@@ -134,7 +136,7 @@ void Img::computeError()
 				e_b = error;
 			else
 				e_b = error / e_b;
-			E_b.at<float>(i, j) = e_b * W_b.at<float>(i, j) /(1 + P.at<float>(i, j));
+			E_b.at<float>(i, j) = e_b * W_b.at<float>(i, j) /(1 + P.at<int>(i, j));
 		}
 	}
 
@@ -181,7 +183,9 @@ void Img::filter(Mat& M0, Mat& M1, int mode)
 		W_b = Mat(height, width, CV_32FC1, 0.0);
 	}
 	else
+	{
 		F_v = M0.clone();
+	}
 	
 	clock_t t;
 	t = clock();
@@ -201,7 +205,10 @@ void Img::filter(Mat& M0, Mat& M1, int mode)
 				W_b.at<float>(i, j) = w_b;
 			}
 			else
+			{
 				filterPixel(i, j, F_v, M1, mode);
+
+			}
 
 		}
 	}
@@ -217,21 +224,24 @@ float Img::filterPixel(int i, int j, Mat& M0, Mat& M1, int mode)
 	Vec3f sum(0.0f);
 
 	// Iterate all neighboring patches in buffer M1
-	#pragma omp parallel
+	//#pragma omp parallel
 	for (int offset = -r; offset <= r; offset++)
 	{
-		#pragma omp for schedule(dynamic,1)
+		//#pragma omp for schedule(dynamic,1)
 		for (int offset1 = -r; offset1 <= r; offset1++)
 		{
 			float D = getDistPatch(i, j, i + offset, j + offset1, M1, mode);
 			float w = getWeight(D);
 			if (w < 0.05f)
 				w = 0.0f;
-			totalW += w;
-			Vec3b q = M1.at<Vec3b>(i + offset, j + offset1);
-			sum[0] += w * float(q.val[0]) / 255.0f;
-			sum[1] += w * float(q.val[1]) / 255.0f;
-			sum[2] += w * float(q.val[2]) / 255.0f;
+			else
+			{
+				totalW += w;
+				Vec3b q = M1.at<Vec3b>(i + offset, j + offset1);
+				sum[0] += w * float(q.val[0]) * sfactor;
+				sum[1] += w * float(q.val[1]) * sfactor;
+				sum[2] += w * float(q.val[2]) * sfactor;
+			}
 		}
 	}
 
@@ -254,7 +264,7 @@ float Img::getDistPatch(int pi, int pj, int qi, int qj, Mat & M, int mode)
 			dist += getModDistPix(pi + di, pj + dj, qi + di, qj + dj, M, mode);
 
 	float D = dist[0] + dist[1] + dist[2];
-	D /= float(3 * pow(2 * f + 1, 2));
+	D /= normc;// float(3 * pow(2 * f + 1, 2));
 
 	return D;
 }
@@ -263,15 +273,15 @@ Vec3f Img::getDistPix(int pi, int pj, int qi, int qj, Mat & M)
 {
 	uchar & pb = M.at<Vec3b>(pi, pj).val[0];
 	uchar & qb = M.at<Vec3b>(qi, qj).val[0];
-	float diffb = (float(pb) - float(qb)) / 255.0f;
+	float diffb = (float(pb) - float(qb)) * sfactor;
 
 	uchar & pg = M.at<Vec3b>(pi, pj).val[1];
 	uchar & qg = M.at<Vec3b>(qi, qj).val[1];
-	float diffg = (float(pg) - float(qg)) / 255.0f;
+	float diffg = (float(pg) - float(qg)) * sfactor;
 
 	uchar & pr = M.at<Vec3b>(pi, pj).val[2];
 	uchar & qr = M.at<Vec3b>(qi, qj).val[2];
-	float diffr = (float(pr) - float(qr)) / 255.0f;
+	float diffr = (float(pr) - float(qr)) * sfactor;
 
 	return Vec3f(diffb * diffb, diffg * diffg, diffr * diffr);
 }
@@ -291,42 +301,39 @@ Vec3f Img::getModDistPix(int pi, int pj, int qi, int qj, Mat & M, int mode)
 	}
 
 	// Smaller gives sharper but artifacted images(0.01f)
-	float threshold = 0.0001f;
+	float threshold = 0.0000000001f;//0.0001f;
 
 	glm::vec3 pf(float(pvar.val[0]), float(pvar.val[1]), float(pvar.val[2]));
 	glm::vec3 qf(float(qvar.val[0]), float(qvar.val[1]), float(qvar.val[2]));
-	pf /= 255.0f;
-	qf /= 255.0f;
+	pf *= sfactor;
+	qf *= sfactor;
 
-	uchar & pb = M.at<Vec3b>(pi, pj).val[0];
-	uchar & qb = M.at<Vec3b>(qi, qj).val[0];
-	float diffb = (float(pb) - float(qb)) / 255.0f;
+	glm::vec3 div = k * (pf + qf);
+	glm::vec3 pcolor((float)M.at<Vec3b>(pi, pj).val[0], (float)M.at<Vec3b>(pi, pj).val[1], (float)M.at<Vec3b>(pi, pj).val[2]);
+	glm::vec3 qcolor((float)M.at<Vec3b>(qi, qj).val[0], (float)M.at<Vec3b>(qi, qj).val[1], (float)M.at<Vec3b>(qi, qj).val[2]);
+	glm::vec3 diff = (pcolor - qcolor) * sfactor;
+	glm::vec3 powered = diff * diff;
 
-	float div = k * k * (pf.x + qf.x);
-	if (div < threshold)
-		diffb = (diffb*diffb);
+	float diffb = powered.x;
+	if (div.x < threshold)
+		diffb *= 0.0000000001f;
 	else
-		diffb = (diffb*diffb - a * (pf.x + max(pf.x, qf.x))) / (div);
+		//diffb = diffb / div.x - a / k;
+		diffb = (diffb - a * (pf.x + min(pf.x, qf.x))) / (div.x);
 
-	uchar & pg = M.at<Vec3b>(pi, pj).val[1];
-	uchar & qg = M.at<Vec3b>(qi, qj).val[1];
-	float diffg = (float(pg) - float(qg)) / 255.0f;
-
-	div = k * k * (pf.y + qf.y);
-	if (div < threshold)
-		diffg = (diffg*diffg);
+	float diffg = powered.y;
+	if (div.y < threshold)
+		diffg *= 0.0000000001f;
 	else
-		diffg = (diffg*diffg - a * (pf.y + max(pf.y, qf.y))) / (div);
+		//diffg = diffg / div.y - a / k;
+		diffg = (diffg - a * (pf.y + min(pf.y, qf.y))) / (div.y);
 
-	uchar & pr = M.at<Vec3b>(pi, pj).val[2];
-	uchar & qr = M.at<Vec3b>(qi, qj).val[2];
-	float diffr = (float(pr) - float(qr)) / 255.0f;
-
-	div = k * k * (pf.z + qf.z);
-	if (div < threshold)
-		diffr = (diffr*diffr);
+	float diffr = powered.z;
+	if (div.z < threshold)
+		diffr *= 0.0000000001f;
 	else
-		diffr = (diffr*diffr - a * (pf.z + max(pf.z, qf.z))) / (div);
+		//diffr = diffb / div.z - a / k;
+		diffr = (diffr - a * (pf.z + min(pf.z, qf.z))) / (div.z);
 
 	return Vec3f(diffb, diffg, diffr);
 }
