@@ -249,8 +249,8 @@ float Img::getDistPatch(int pi, int pj, int qi, int qj, Mat & M, int mode)
 {
 	Vec3f dist(0.0f);
 
-	for (int di = -f; di <= f; di += 1)
-		for (int dj = -f; dj <= f; dj += 1)
+	for (int di = -f; di <= f; di++)
+		for (int dj = -f; dj <= f; dj++)
 			dist += getModDistPix(pi + di, pj + dj, qi + di, qj + dj, M, mode);
 
 	float D = dist[0] + dist[1] + dist[2];

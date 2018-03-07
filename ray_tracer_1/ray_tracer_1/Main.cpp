@@ -64,7 +64,7 @@ void filter_test()
 	I->Filter(1);
 
 	// (2) Filter images
-	I->setConstants(3, 3);// 1, 3 smaller gives sharper
+	I->setConstants(5, 3);// 1, 3 smaller gives sharper
 	I->setConstants2(0.5f, 1.0f, 0.45f);
 	I->Filter(0);
 
