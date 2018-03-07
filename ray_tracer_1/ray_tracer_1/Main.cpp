@@ -148,7 +148,7 @@ void project3()
 	t = clock() - t;
 	int seconds = ((double)t) / CLOCKS_PER_SEC;
 	//printf("Time: %d clicks (%f seconds).\n", t, seconds);
-	cout << seconds << " seconds elapsed"<< endl;
+	cout << seconds << " seconds elapsed in rendering"<< endl;
 
 	// Save image
 	string name = "D://Github//temp//test_";

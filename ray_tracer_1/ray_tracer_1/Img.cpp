@@ -182,6 +182,9 @@ void Img::filter(Mat& M0, Mat& M1, int mode)
 	}
 	else
 		F_v = M0.clone();
+	
+	clock_t t;
+	t = clock();
 
 	#pragma omp parallel
 	for (int i = r + f; i < height - (r + f); i++)
@@ -202,6 +205,10 @@ void Img::filter(Mat& M0, Mat& M1, int mode)
 
 		}
 	}
+
+	t = clock() - t;
+	int seconds = ((double)t) / CLOCKS_PER_SEC;
+	cout << seconds << " seconds elapsed in filtering" << endl;
 }
 
 float Img::filterPixel(int i, int j, Mat& M0, Mat& M1, int mode)
