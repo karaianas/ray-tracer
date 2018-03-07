@@ -210,17 +210,22 @@ float Img::filterPixel(int i, int j, Mat& M0, Mat& M1, int mode)
 	Vec3f sum(0.0f);
 
 	// Iterate all neighboring patches in buffer M1
+	#pragma omp parallel
 	for (int offset = -r; offset <= r; offset++)
 	{
-		float D = getDistPatch(i, j, i + offset, j + offset, M1, mode);
-		float w = getWeight(D);
-		if (w < 0.05f)
-			w = 0.0f;
-		totalW += w;
-		Vec3b q = M1.at<Vec3b>(i + offset, j + offset);
-		sum[0] += w * float(q.val[0]) / 255.0f;
-		sum[1] += w * float(q.val[1]) / 255.0f;
-		sum[2] += w * float(q.val[2]) / 255.0f;
+		#pragma omp for schedule(dynamic,1)
+		for (int offset1 = -r; offset1 <= r; offset1++)
+		{
+			float D = getDistPatch(i, j, i + offset, j + offset1, M1, mode);
+			float w = getWeight(D);
+			if (w < 0.05f)
+				w = 0.0f;
+			totalW += w;
+			Vec3b q = M1.at<Vec3b>(i + offset, j + offset1);
+			sum[0] += w * float(q.val[0]) / 255.0f;
+			sum[1] += w * float(q.val[1]) / 255.0f;
+			sum[2] += w * float(q.val[2]) / 255.0f;
+		}
 	}
 
 	sum /= totalW;
