@@ -18,9 +18,19 @@ public:
 	void saveImg(string filename, Mat & M);
 
 	// Information from path tracer
+	void setBudget(int b) 
+	{ 
+		budget = b; 
+		//P = Mat(height, width, CV_32SC1, budget);
+	};
 	void sendToA(int i, int j, glm::vec3 variance, glm::vec3 color);
 	void sendToB(int i, int j, glm::vec3 variance, glm::vec3 color);
 	void sendToV(int i, int j, glm::vec3 variance);
+
+	void stop();
+
+	// Send information to path tracer
+	int getSampleNum(int i, int j) { return (float)P_.at<uchar>(i, j); };
 
 	// Variance computation
 	void initVarEst();
@@ -44,6 +54,9 @@ public:
 	};
 	void setConstants2(float a_, float e_, float k_) { a = a_; e = e_; k = k_; };
 
+	Mat mul();
+
+	void printResult();
 private:
 
 	// Dual image buffers
@@ -59,6 +72,8 @@ private:
 	// Combined
 	Mat C;
 
+	Mat AA, BB;
+
 	// Constants
 	int r, f;
 	float a, e, k;
@@ -67,9 +82,11 @@ private:
 	Mat W_a, W_b;
 
 	// Number of samples per pixel
-	Mat P;
+	Mat P, P_;
+	int budget;
 
 	int width, height;
 
 	float normc;
+	bool isStop;
 };

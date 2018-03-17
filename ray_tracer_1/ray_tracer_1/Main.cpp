@@ -45,7 +45,7 @@ int main(int argc,char **argv)
 	cout << "Initial path tracing complete." << endl;
 
 	// Filtering
-	filter_test();
+	//filter_test();
 
 	cout << "Variance filtered" << endl;
 
@@ -58,19 +58,22 @@ int main(int argc,char **argv)
 ////////////////////////////////////////////////////////////////////////////////
 void filter_test()
 {
-	// (1) Filter variances
-	I->setConstants(1, 3);// 1, 3
-	I->setConstants2(4.0f, 1.0f, 0.45f * 0.45f);
-	I->Filter(1);
+	for (int i = 0; i < 4; i++)
+	{
+		// (1) Filter variances
+		I->setConstants(1, 3);// 1, 3
+		I->setConstants2(4.0f, 1.0f, 0.45f * 0.45f);
+		I->Filter(1);
 
-	// (2) Filter images
-	// (3, 1) works best for 4by4
-	I->setConstants(3, 1);// (7, 3) in the original paper
-	I->setConstants2(0.5f, 1.0f, 0.45f * 0.45f);
-	I->Filter(0);
+		// (2) Filter images
+		// (3, 1) works best for 4by4
+		I->setConstants(3, 1);// (7, 3) in the original paper
+		I->setConstants2(0.5f, 1.0f, 0.45f * 0.45f);
+		I->Filter(0);
 
-	// (3) Compute error
-	I->computeError();
+		// (3) Compute error
+		I->computeError();
+	}
 }
 
 void project3()
@@ -134,6 +137,7 @@ void project3()
 	int nx, ny;
 	cout << "Enter number of samples: ";
 	cin >> nx >> ny;
+	I->setBudget(nx * ny);
 	cam.SetSuperSample(nx, ny);
 	cam.SetJitter(true);
 	//cam.SetShirley(true);
@@ -141,26 +145,72 @@ void project3()
 	// Filter test
 	cam.I = I;
 
-	clock_t t;
-	t = clock();
+	//clock_t t;
+	//t = clock();
 
-	// Render image
-	cam.Render(scn);
+	//// Render image
+	//cam.Render(scn);
 
-	t = clock() - t;
-	int seconds = ((double)t) / CLOCKS_PER_SEC;
-	//printf("Time: %d clicks (%f seconds).\n", t, seconds);
-	cout << seconds << " seconds elapsed in rendering"<< endl;
+	//t = clock() - t;
+	//int seconds = ((double)t) / CLOCKS_PER_SEC;
+	////printf("Time: %d clicks (%f seconds).\n", t, seconds);
+	//cout << seconds << " seconds elapsed in rendering" << endl;
 
-	// Save image
-	string name = "D://Github//temp//test_";
-	name += to_string(nx);
-	name += "by";
-	name += to_string(ny);
-	name += "_";
-	name += to_string(seconds);
-	name += ".bmp";
-	cam.SaveBitmap((char*)name.c_str());
+	//// Save image
+	//string name = "D://Github//temp//test_";
+	//name += to_string(nx);
+	//name += "by";
+	//name += to_string(ny);
+	//name += "_";
+	//name += to_string(seconds);
+	//name += ".bmp";
+	//cam.SaveBitmap((char*)name.c_str());
+
+	//I->printResult();
+
+	int niter = 9;
+	for (int i = 0; i < niter; i++)
+	{
+		clock_t t;
+		t = clock();
+
+		// Render image
+		cam.Render(scn);
+
+		t = clock() - t;
+		int seconds = ((double)t) / CLOCKS_PER_SEC;
+		//printf("Time: %d clicks (%f seconds).\n", t, seconds);
+		cout << seconds << " seconds elapsed in rendering" << endl;
+
+		// (1) Filter variances
+		I->setConstants(1, 3);// 1, 3
+		I->setConstants2(4.0f, 1.0f, 0.45f * 0.45f);
+		I->Filter(1);
+
+		// (2) Filter images
+		// (3, 1) works best for 4by4
+		I->setConstants(1, 3);// (7, 3) in the original paper(1, 3)
+		I->setConstants2(0.5f, 1.0f, 0.45f * 0.45f);
+		I->Filter(0);
+
+		// (3) Compute error
+		if (i == niter - 1)
+			I->stop();
+		I->computeError();
+
+		//// Save image
+		//string name = "D://Github//temp//test_";
+		//name += to_string(nx);
+		//name += "by";
+		//name += to_string(ny);
+		//name += "_";
+		//name += to_string(seconds);
+		//name += ".bmp";
+		//cam.SaveBitmap((char*)name.c_str());
+	}
+	////I->printResult();
+
+
 }
 
 void project2()

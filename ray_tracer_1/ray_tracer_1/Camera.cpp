@@ -48,8 +48,8 @@ void Camera::Render(Scene & s)
 
 	if (EnableJitter)
 	{
-		int num = rand() % 100 + 100;
-		samples = R.RandomNumbers(num, nx * ny * XRes * YRes);
+		//int num = rand() % 100 + 100;
+		//samples = R.RandomNumbers(num, nx * ny * XRes * YRes);
 
 		//vector<float> test;
 		//mt19937::result_type seed = time(0);
@@ -58,7 +58,7 @@ void Camera::Render(Scene & s)
 		//	auto real_rand = std::bind(std::uniform_real_distribution<double>(0, 1), mt19937(seed));
 		//	test.push_back(float(real_rand()));
 		//}
-		
+
 		#pragma omp parallel
 		for (int y = 0; y < YRes; y++)
 		{
@@ -75,14 +75,80 @@ void Camera::Render(Scene & s)
 					Color a, b;
 					a.Set(0.0f, 0.0f, 0.0f);
 					b.Set(0.0f, 0.0f, 0.0f);
-					//cout << "--------------" << endl;
-					for (int index = 0; index < nx * ny; index++)
-					{
-						int j = index % nx;
-						int i = (index - j) / nx;
 
-						float s_ = float(j) / float(nx) + samples[index + counter][0] / float(nx);
-						float t_ = float(i) / float(ny) + samples[index + counter][1] / float(ny);
+					int spp = I->getSampleNum(YRes - y - 1, x);
+
+					for (int index = 0; index < spp; index++)
+					{
+						float s_ = float(rand() % 10000) / 10000.0f;
+						float t_ = float(rand() % 10000) / 10000.0f;
+
+						//if(x == 0 && y == 0)
+						//	cout << s_ << " " << t_ << endl;
+
+						//if (x == 0 && y == 1)
+						//	cout << s_ << " " << t_ << endl;
+
+						float fx = ((float(x) + s_)) / float(XRes) - 0.5f;
+						float fy = ((float(y) + t_)) / float(YRes) - 0.5f;
+						//cout << fx << " " << fy << endl;
+
+						Ray ray;
+						ray.Direction = glm::normalize(fx * scaleX * WorldMatrix[0] + fy * scaleY * WorldMatrix[1] - WorldMatrix[2]);
+						ray.Origin = WorldMatrix[3];
+
+						Intersection hit;
+
+						RayTrace RT(s);
+
+						// Path tracer
+						bool in = RT.TracePath(ray, hit, 0);
+
+						c.Add(hit.Shade);
+
+						if (index % 2 == 0)
+							a.Add(hit.Shade);
+						else
+							b.Add(hit.Shade);
+						tcolors.push_back(hit.Shade);
+						counter++;
+
+					}
+
+					if (spp > 0)
+					{
+						a.Scale(1.0f / float(spp / 2.0f));
+						b.Scale(1.0f / float(spp / 2.0f));
+						c.Scale(1.0f / float(spp));
+						BMP->SetPixel(x, y, c.ToInt());
+
+						// Need to calculate empirical variances here
+						I->sendToV(YRes - y - 1, x, getVariance(c, tcolors, 0));
+						I->sendToA(YRes - y - 1, x, getVariance(a, tcolors, 1), glm::vec3(a.Red, a.Green, a.Blue));
+						I->sendToB(YRes - y - 1, x, getVariance(b, tcolors, 2), glm::vec3(b.Red, b.Green, b.Blue));
+					}
+					else
+					{
+						//cout << "wth" << endl;
+					}
+					
+					/*
+					int spp = I->getSampleNum(YRes - y - 1, x);
+					int nx_ = spp;
+					int ny_ = spp;
+
+					for (int index = 0; index < nx_ * ny_; index++)
+					{
+						int j = index % nx_;
+						int i = (index - j) / nx_;
+
+						float samplex = float(rand() % 10000) / 10000.0f;
+						float sampley = float(rand() % 10000) / 10000.0f;
+
+						float s_ = float(j) / float(nx_) + samplex/ float(nx_);
+						float t_ = float(i) / float(ny_) +  sampley/ float(ny_);
+						//float s_ = float(j) / float(nx) + samples[index + counter][0] / float(nx);
+						//float t_ = float(i) / float(ny) + samples[index + counter][1] / float(ny);
 
 						//cout << s_ << " " << t_ << endl;
 						float fx = ((float(x) + s_)) / float(XRes) - 0.5f;
@@ -111,15 +177,23 @@ void Camera::Render(Scene & s)
 
 					}
 
-					a.Scale(2.0f / float(nx * ny));
-					b.Scale(2.0f / float(nx * ny));
-					c.Scale(1.0f / float(nx * ny));
-					BMP->SetPixel(x, y, c.ToInt());
+					if (nx_ * ny_ > 0)
+					{
+						a.Scale(2.0f / float(nx_ * ny_));
+						b.Scale(2.0f / float(nx_ * ny_));
+						c.Scale(1.0f / float(nx_ * ny_));
+						BMP->SetPixel(x, y, c.ToInt());
 
-					// Need to calculate empirical variances here
-					I->sendToV(YRes - y, x, getVariance(c, tcolors, 0));
-					I->sendToA(YRes - y, x, getVariance(a, tcolors, 1), glm::vec3(a.Red, a.Green, a.Blue));
-					I->sendToB(YRes - y, x, getVariance(b, tcolors, 2), glm::vec3(b.Red, b.Green, b.Blue));
+						// Need to calculate empirical variances here
+						I->sendToV(YRes - y - 1, x, getVariance(c, tcolors, 0));
+						I->sendToA(YRes - y - 1, x, getVariance(a, tcolors, 1), glm::vec3(a.Red, a.Green, a.Blue));
+						I->sendToB(YRes - y - 1, x, getVariance(b, tcolors, 2), glm::vec3(b.Red, b.Green, b.Blue));
+					}
+					else
+					{
+						//cout << "wth" << endl;
+					}
+					*/
 				}
 			}
 		}
@@ -179,52 +253,6 @@ void Camera::RenderPixel(int x, int y)
 
 }
 
-void Camera::BlockProcess(Scene &s, float scaleX, float scaleY, int counter, vector<glm::vec2> samples)
-{
-	for (int y = 0; y < YRes; y++)
-	{
-		for (int x = 0; x < XRes; x++)
-		{
-
-			Color c;
-			c.Set(0.0f, 0.0f, 0.0f);
-
-			for (int index = 0; index < nx * ny; index++)
-			{
-				int j = index % nx;
-				int i = (index - j) / nx;
-				
-				float s_ = -0.5f + float(j) / float(nx) + samples[index + counter][0] / float(nx);
-				float t_ = -0.5f + float(i) / float(ny) + samples[index + counter][1] / float(ny);
-
-				float fx = ((float(x) + 0.5f + s_)) / float(XRes) - 0.5f;
-				float fy = ((float(y) + 0.5f + t_)) / float(YRes) - 0.5f;
-
-				Ray ray;
-				ray.Direction = glm::normalize(fx * scaleX * WorldMatrix[0] + fy * scaleY * WorldMatrix[1] - WorldMatrix[2]);
-				ray.Origin = WorldMatrix[3];
-
-				Intersection hit;
-
-				RayTrace RT(s);
-
-				// Path tracer
-				bool in = RT.TracePath(ray, hit, 0, 1.0f);
-
-				//if (in)
-				//	c.Add(hit.Shade);
-				//else
-				//	c.Add(hit.Shade);
-
-				counter++;
-
-			}
-			//c.Scale(1.0f / float(nx * ny));
-			//BMP->SetPixel(x, y, c.ToInt());
-		}
-	}
-}
-
 glm::vec3 Camera::getVariance(Color & avg, vector<Color>& colors, int mode)
 {
 	glm::vec3 var(0.0f);
@@ -247,12 +275,15 @@ glm::vec3 Camera::getVariance(Color & avg, vector<Color>& colors, int mode)
 	// Variance of A
 	else if (mode == 1)
 	{
-		for (int i = 0; i < colors.size() - 1; i+=2)
+		for (int i = 0; i < colors.size(); i++)
 		{
-			Color c = colors[i];
-			rsum += pow(c.Red - r, 2.0f);
-			gsum += pow(c.Green - g, 2.0f);
-			bsum += pow(c.Blue - b, 2.0f);
+			if (i % 2 == 0)
+			{
+				Color c = colors[i];
+				rsum += pow(c.Red - r, 2.0f);
+				gsum += pow(c.Green - g, 2.0f);
+				bsum += pow(c.Blue - b, 2.0f);
+			}
 		}
 	}
 	// Variance of B
