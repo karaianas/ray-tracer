@@ -57,7 +57,7 @@ public:
 
 	void printResult();
 
-private:
+//private:
 
 	// Dual image buffers
 	Mat A, B, V;

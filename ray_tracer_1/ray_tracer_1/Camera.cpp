@@ -105,7 +105,10 @@ void Camera::Render(Scene & s)
 					a.Scale(1.0f / float(spp / 2.0f));
 					b.Scale(1.0f / float(spp / 2.0f));
 					c.Scale(1.0f / float(spp));
+
+					// *********************************
 					//BMP->SetPixel(x, y, c.ToInt());
+					// *********************************
 
 					// Need to calculate empirical variances here
 					I->sendToV(YRes - y - 1, x, getVariance(c, tcolors, 0));

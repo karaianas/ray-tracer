@@ -128,31 +128,53 @@ void adaptiveRendering()
 		// Render image
 		cam.Render(scn);
 
+		// ***********************
+		//cam.SaveBitmap("D://Github//temp//Naive.bmp");
+
+		//I->saveImg("InitA.png", I->A, 0);
+		//I->saveImg("InitB.png", I->B, 0);
+
+		
 		// (1) Filter variances
 		I->setConstants(1, 3);
 		I->setConstants2(4.0f, 1.0f, 0.45f * 0.45f);
 		I->Filter(1);
 
+		// ***********************
+		//I->saveImg("InitEmpV.png", I->V_e, 0);
+		//I->saveImg("InitEstV.png", I->V_d, 0);
+		//I->saveImg("FilteredV.png", I->F_v, 0);
+
 		// (2) Filter images
 		// (3, 1) works best for 4by4
-		I->setConstants(1, 3);// (7, 3) in the original paper(1, 3)
+		I->setConstants(1, 3);// (7, 3) in the original paper
 		I->setConstants2(0.5f, 1.0f, 0.45f * 0.45f);
 		I->Filter(0);
 
+		// ***********************
+		//I->saveImg("FiltA.png", I->F_a, 0);
+		//I->saveImg("FiltB.png", I->F_b, 0);
+
 		// (3) Compute error
 		I->computeError(i);
+
+		// ***********************
+		//I->saveImg("EMAP.png", I->E_map, 1);
 
 		t = clock() - t;
 		float seconds = ((double)t) / CLOCKS_PER_SEC;
 		printf("Iteration Time: %2.2f seconds\n", seconds);
 
 		cout << endl;
+		
+		
 	}
 
 	clock_t dT = clock() - startTime;
 	float duration = ((double)dT) / CLOCKS_PER_SEC;
 	printf("Total Time: %2.2f seconds\n", duration);
 
+	//cout << "Total number of samples: " << sum(I->P)[0];
 	// Save images
 	I->printResult();
 

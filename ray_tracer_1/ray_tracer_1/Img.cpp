@@ -158,19 +158,20 @@ void Img::computeError(int niter)
 	add(E_a, E_b, E_map);
 	GaussianBlur(E_map, E_map, Size(3, 3), 0.8);
 
-	// Comment this part out for proper time measurement
-	string fname = "ErrorMap";
-	fname += "_";
-	fname += to_string(niter);
-	fname += ".png";
-	saveImg((char*)fname.c_str(), E_map, 1);
+	// *********************************
+	//string fname = "ErrorMap";
+	//fname += "_";
+	//fname += to_string(niter);
+	//fname += ".png";
+	//saveImg((char*)fname.c_str(), E_map, 1);
+	// *********************************
 
 	// Normalize
 	float s = sum(E_map)[0];
 	E_map = float(budget * height * width) / s * E_map;//(2.0f * s) * result;
 
 	// Clamp the values
-	int threshold = 4;
+	int threshold = 16;
 	for (int i = 0; i < height; i++)
 	{
 		for (int j = 0; j < width; j++)
