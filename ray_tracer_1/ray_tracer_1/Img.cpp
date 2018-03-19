@@ -18,9 +18,6 @@ Img::Img(int h, int w)
 	B = Mat(height, width, CV_8UC3, Scalar(0, 0, 0));
 
 	P = Mat(height, width, CV_8UC1, Scalar(0));
-	P_ = Mat(height, width, CV_8UC1, Scalar(4));
-
-	isStop = false;
 }
 
 void Img::displayImg(Mat & M, bool isNorm, bool isScale)
@@ -36,10 +33,19 @@ void Img::displayImg(Mat & M, bool isNorm, bool isScale)
 	waitKey(0);
 }
 
-void Img::saveImg(string filename, Mat & M)
+void Img::saveImg(string filename, Mat & M, bool isColormap)
 {
 	string filepath = "D://Github//temp//" + filename;
-	imwrite(filepath, M);
+	if (isColormap)
+	{
+		Mat temp; 
+		//normalize(M, temp, 0, 1, NORM_MINMAX);
+		M.convertTo(temp, CV_8UC1, 255.0f);
+		applyColorMap(temp, temp, COLORMAP_JET);
+		imwrite(filepath, temp);
+	}
+	else
+		imwrite(filepath, M);
 }
 
 void Img::sendToA(int i, int j, glm::vec3 variance, glm::vec3 color)
@@ -47,7 +53,6 @@ void Img::sendToA(int i, int j, glm::vec3 variance, glm::vec3 color)
 	Vec3f newValue = Vec3f(A.at<Vec3b>(i, j)) * float(P.at<uchar>(i, j)) * 0.5f \
 		+ Vec3f(color[2], color[1], color[0])* 255.0f * float(P_.at<uchar>(i, j)) * 0.5f;
 	newValue /= float(P.at<uchar>(i, j)) * 0.5f + float(P_.at<uchar>(i, j)) * 0.5f;
-
 	
 	A.at<Vec3b>(i, j) = Vec3b(newValue);
 	V_a.at<Vec3b>(i, j) = Vec3b(Vec3f(variance[2], variance[1], variance[0]) * 255.0f);
@@ -68,16 +73,14 @@ void Img::sendToV(int i, int j, glm::vec3 variance)
 	V_e.at<Vec3b>(i, j) = Vec3b(Vec3f(variance[2], variance[1], variance[0]) * 255.0f);
 }
 
-void Img::stop()
-{
-	isStop = true;
-}
-
 void Img::initVarEst()
 {
 	absdiff(A, B, V);
+
+	#pragma omp parallel
 	for (int i = 0; i < height; i++)
 	{
+		#pragma omp for schedule(dynamic,1)
 		for (int j = 0; j < width; j++)
 		{
 			uchar b = V.at<Vec3b>(i, j).val[0];
@@ -99,7 +102,7 @@ void Img::initVarEst()
 	}
 }
 
-void Img::computeError()
+void Img::computeError(int niter)
 {
 	Mat dE;
 	absdiff(A, B, dE);
@@ -110,8 +113,10 @@ void Img::computeError()
 	// Update spp count
 	add(P, P_, P);
 
+	#pragma omp parallel
 	for (int i = 0; i < height; i++)
 	{
+		#pragma omp for schedule(dynamic,1)
 		for (int j = 0; j < width; j++)
 		{
 			float b = float(dE.at<Vec3b>(i, j).val[0]) * sfactor;
@@ -148,28 +153,21 @@ void Img::computeError()
 	}
 
 	combineBuffers(F_a, F_b);
-	if (isStop)
-	{
-		displayImg(C, 0, 0);
-		saveImg("Combined.png", C);
-
-		//displayImg(F_v, 1, 1);
-	}
 
 	// Sum of weighted error maps
-	Mat errorMap;
-	add(E_a, E_b, errorMap);
+	add(E_a, E_b, E_map);
+	GaussianBlur(E_map, E_map, Size(3, 3), 0.8);
 
-	Mat result;
-	GaussianBlur(errorMap, result, Size(3, 3), 0.8);
-	if (isStop)
-		displayImg(result, 1, 1);
+	// Comment this part out for proper time measurement
+	string fname = "ErrorMap";
+	fname += "_";
+	fname += to_string(niter);
+	fname += ".png";
+	saveImg((char*)fname.c_str(), E_map, 1);
 
 	// Normalize
-	//normalize(result, result, 0, 1, NORM_MINMAX);
-	float s = sum(result)[0];
-	//result = float(budget * height * width) / (2.0f * s) * result;
-	result = float(budget * height * width) / s * result;
+	float s = sum(E_map)[0];
+	E_map = float(budget * height * width) / s * E_map;//(2.0f * s) * result;
 
 	// Clamp the values
 	int threshold = 4;
@@ -177,10 +175,10 @@ void Img::computeError()
 	{
 		for (int j = 0; j < width; j++)
 		{
-			if (result.at<float>(i, j) > threshold)
-				result.at<float>(i, j) = threshold;
+			if (E_map.at<float>(i, j) > threshold)
+				E_map.at<float>(i, j) = threshold;
 
-			int extraRayNum = int(result.at<float>(i, j));
+			int extraRayNum = int(E_map.at<float>(i, j));
 
 			if (extraRayNum % 2 != 0)
 				P_.at<uchar>(i, j) = uchar(extraRayNum + 1);
@@ -234,6 +232,9 @@ void Img::combineBuffers(Mat & M0, Mat & M1)
 
 void Img::Filter(int mode)
 {
+	clock_t t;
+	t = clock();
+
 	// Image filter
 	if (mode == 0)
 		filter(A, B, mode);
@@ -244,6 +245,10 @@ void Img::Filter(int mode)
 		absdiff(V_a, V_b, V_d);
 		filter(V, V_e, mode);
 	}
+
+	t = clock() - t;
+	float seconds = ((double)t) / CLOCKS_PER_SEC;
+	printf("Filtering Time: %2.2f seconds\n", seconds);
 }
 
 void Img::filter(Mat& M0, Mat& M1, int mode)
@@ -257,9 +262,6 @@ void Img::filter(Mat& M0, Mat& M1, int mode)
 	}
 	else
 		F_v = M0.clone();
-	
-	clock_t t;
-	t = clock();
 
 	#pragma omp parallel
 	for (int i = r + f; i < height - (r + f); i++)
@@ -279,10 +281,6 @@ void Img::filter(Mat& M0, Mat& M1, int mode)
 				filterPixel(i, j, F_v, M1, mode);
 		}
 	}
-
-	t = clock() - t;
-	float seconds = ((double)t) / CLOCKS_PER_SEC;
-	//cout << seconds << " seconds elapsed in filtering" << endl;
 }
 
 float Img::filterPixel(int i, int j, Mat& M0, Mat& M1, int mode)
@@ -407,8 +405,7 @@ Vec3f Img::getModDistPix(int pi, int pj, int qi, int qj, Mat & M, int mode)
 
 void Img::printResult()
 {
-	//saveImg("Non-filtered A.png", A);
-	//saveImg("Non-filtered B.png", B);
-	//saveImg("Non-filtered Whole", A);
+	displayImg(C, 0, 0);
+	saveImg("FinalResult.png", C, 0);
 }
 

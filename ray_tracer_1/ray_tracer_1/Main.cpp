@@ -31,7 +31,6 @@ void project1();
 void project2();
 void project3();
 
-void filter_test();
 void adaptiveRendering();
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,6 +43,7 @@ int main(int argc,char **argv)
 	while (1)
 	{
 	}
+
 	return 0;
 }
 
@@ -104,17 +104,20 @@ void adaptiveRendering()
 	cam.SetFOV(40.0f);
 
 	// Camera settings
-	int nx, ny;
+	int spp;
 	cout << "Enter the sample budget: ";
-	cin >> nx >> ny;
-	I->setBudget(nx * ny);
+	cin >> spp;
+	I->setBudget(spp);
 	cam.SetJitter(true);
 	cam.I = I;
 
+	int niter;
+	cout << "Enter the number of iterations: ";
+	cin >> niter;
+
 	clock_t startTime;
 	startTime = clock();
-	// Filter settings
-	int niter = 6;
+
 	for (int i = 0; i < niter; i++)
 	{
 		cout << "===================== " << i << " =====================" << endl;
@@ -137,21 +140,11 @@ void adaptiveRendering()
 		I->Filter(0);
 
 		// (3) Compute error
-		I->computeError();
+		I->computeError(i);
 
 		t = clock() - t;
 		float seconds = ((double)t) / CLOCKS_PER_SEC;
 		printf("Iteration Time: %2.2f seconds\n", seconds);
-
-		//// Save image
-		//string name = "D://Github//temp//test_";
-		//name += to_string(nx);
-		//name += "by";
-		//name += to_string(ny);
-		//name += "_";
-		//name += to_string(seconds);
-		//name += ".bmp";
-		//cam.SaveBitmap((char*)name.c_str());
 
 		cout << endl;
 	}
@@ -159,26 +152,18 @@ void adaptiveRendering()
 	clock_t dT = clock() - startTime;
 	float duration = ((double)dT) / CLOCKS_PER_SEC;
 	printf("Total Time: %2.2f seconds\n", duration);
-}
 
-void filter_test()
-{
-	for (int i = 0; i < 4; i++)
-	{
-		// (1) Filter variances
-		I->setConstants(1, 3);// 1, 3
-		I->setConstants2(4.0f, 1.0f, 0.45f * 0.45f);
-		I->Filter(1);
+	// Save images
+	I->printResult();
 
-		// (2) Filter images
-		// (3, 1) works best for 4by4
-		I->setConstants(3, 1);// (7, 3) in the original paper
-		I->setConstants2(0.5f, 1.0f, 0.45f * 0.45f);
-		I->Filter(0);
-
-		// (3) Compute error
-		I->computeError();
-	}
+	//string name = "D://Github//temp//test_";
+	//name += to_string(nx);
+	//name += "by";
+	//name += to_string(ny);
+	//name += "_";
+	//name += to_string(seconds);
+	//name += ".bmp";
+	//cam.SaveBitmap((char*)name.c_str());
 }
 
 void project3()

@@ -6,7 +6,6 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-
 using namespace cv;
 using namespace std;
 
@@ -16,18 +15,17 @@ public:
 
 	// Image manipulation
 	void displayImg(Mat & M, bool isNorm, bool isScale);
-	void saveImg(string filename, Mat & M);
+	void saveImg(string filename, Mat & M, bool isColormap);
 
 	// Information from path tracer
 	void setBudget(int b) 
 	{ 
 		budget = b; 
+		P_ = Mat(height, width, CV_8UC1, Scalar(budget));
 	};
 	void sendToA(int i, int j, glm::vec3 variance, glm::vec3 color);
 	void sendToB(int i, int j, glm::vec3 variance, glm::vec3 color);
 	void sendToV(int i, int j, glm::vec3 variance);
-
-	void stop();
 
 	// Send information to path tracer
 	int getSampleNum(int i, int j) { return (int)P_.at<uchar>(i, j); };
@@ -36,7 +34,7 @@ public:
 	void initVarEst();
 
 	// Post processing
-	void computeError();
+	void computeError(int niter);
 	void combineBuffers(Mat & M0, Mat & M1);
 
 	// Filtering
@@ -74,6 +72,9 @@ private:
 	// Combined
 	Mat C;
 
+	// Error map
+	Mat E_map;
+
 	// Constants
 	int r, f;
 	float a, e, k;
@@ -88,5 +89,4 @@ private:
 	int width, height;
 
 	float normc;
-	bool isStop;
 };
