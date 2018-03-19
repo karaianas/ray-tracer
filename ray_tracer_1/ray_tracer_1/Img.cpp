@@ -44,34 +44,10 @@ void Img::saveImg(string filename, Mat & M)
 
 void Img::sendToA(int i, int j, glm::vec3 variance, glm::vec3 color)
 {
-	//if (float(P.at<uchar>(i, j)) > 0 && P_.at<uchar>(i, j) > 0)
-	//{
-	//	cout << "----------------------" << endl;
-	//	cout << i << " " << j << endl;
-	//}
-	//if (i == 760 && j == 587)
-	//{
-	//	cout << "--------------------" << endl;
-	//	cout << float(P_.at<uchar>(i, j)) << endl;
-	//	cout << float(P.at<uchar>(i, j)) << endl;
-	//}
-
-	//A.at<Vec3b>(i, j) = Vec3b(Vec3f(color[2], color[1], color[0]) * 255.0f);
-
-
 	Vec3f newValue = Vec3f(A.at<Vec3b>(i, j)) * float(P.at<uchar>(i, j)) * 0.5f \
 		+ Vec3f(color[2], color[1], color[0])* 255.0f * float(P_.at<uchar>(i, j)) * 0.5f;
 	newValue /= float(P.at<uchar>(i, j)) * 0.5f + float(P_.at<uchar>(i, j)) * 0.5f;
 
-	if (i == 0 && j == 0)
-	{
-		cout << "Num samples: " << float(P_.at<uchar>(i, j)) << endl;
-		cout << "color1: " << color[2] << " " << color[1] << " " << color[0] << endl;
-		cout << "color2: " << newValue[0] << " " << newValue[1] << " " << newValue[2] << endl;
- 	}
-	//Vec3f newValue = Vec3f(A.at<Vec3b>(i, j)) * pow(float(P.at<uchar>(i, j)), 2) * 0.5f \
-	//	+ Vec3f(color[2], color[1], color[0])* 255.0f * pow(float(P_.at<uchar>(i, j)), 2) * 0.5f;
-	//newValue /= pow(float(P.at<uchar>(i, j)), 2) * 0.5f + pow(float(P_.at<uchar>(i, j)), 2) * 0.5f;
 	
 	A.at<Vec3b>(i, j) = Vec3b(newValue);
 	V_a.at<Vec3b>(i, j) = Vec3b(Vec3f(variance[2], variance[1], variance[0]) * 255.0f);
@@ -79,14 +55,9 @@ void Img::sendToA(int i, int j, glm::vec3 variance, glm::vec3 color)
 
 void Img::sendToB(int i, int j, glm::vec3 variance, glm::vec3 color)
 {
-	//B.at<Vec3b>(i, j) = Vec3b(Vec3f(color[2], color[1], color[0]) * 255.0f);
 	Vec3f newValue = Vec3f(B.at<Vec3b>(i, j)) * float(P.at<uchar>(i, j)) * 0.5f \
 		+ Vec3f(color[2], color[1], color[0])* 255.0f * float(P_.at<uchar>(i, j)) * 0.5f;
 	newValue /= float(P.at<uchar>(i, j)) * 0.5f + float(P_.at<uchar>(i, j)) * 0.5f;
-
-	//Vec3f newValue = Vec3f(B.at<Vec3b>(i, j)) * pow(float(P.at<uchar>(i, j)), 2) * 0.5f \
-	//	+ Vec3f(color[2], color[1], color[0])* 255.0f * pow(float(P_.at<uchar>(i, j)), 2) * 0.5f;
-	//newValue /= pow(float(P.at<uchar>(i, j)), 2) * 0.5f + pow(float(P_.at<uchar>(i, j)), 2) * 0.5f;
 	
 	B.at<Vec3b>(i, j) = Vec3b(newValue);
 	V_b.at<Vec3b>(i, j) = Vec3b(Vec3f(variance[2], variance[1], variance[0]) * 255.0f);
@@ -126,31 +97,18 @@ void Img::initVarEst()
 			V.at<Vec3b>(i, j).val[2] = uchar(round(rf * 255.0f));
 		}
 	}
-
-	//pow(V, 2, V);
-	//V *= 10.0f;
 }
 
 void Img::computeError()
 {
-	//displayImg(F_v, 1, 1);
-
 	Mat dE;
 	absdiff(A, B, dE);
 
 	Mat E_a(height, width, CV_32FC1, 0.0);
 	Mat E_b(height, width, CV_32FC1, 0.0);
 
-	// Update pixel count
-	//P = P + P_;
+	// Update spp count
 	add(P, P_, P);
-	//for (int i = 0; i < height; i++)
-	//{
-	//	for (int j = 0; j < width; j++)
-	//	{
-	//		P.at<uchar>(i, j) = uchar(float(P.at<uchar>(i, j)) + float(P_.at<uchar>(i, j)));
-	//	}
-	//}
 
 	for (int i = 0; i < height; i++)
 	{
@@ -177,7 +135,7 @@ void Img::computeError()
 			else
 				e_a = error / e_a;
 
-			E_a.at<float>(i, j) = e_a * W_a.at<float>(i, j) /( 1 + pow((float)P.at<uchar>(i, j), 2));
+			E_a.at<float>(i, j) = e_a * W_a.at<float>(i, j) /( 1 + (float)P.at<uchar>(i, j));
 
 			// Error map for B
 			float e_b = bb*bb + gb*gb + rb*rb;
@@ -185,7 +143,7 @@ void Img::computeError()
 				e_b = error;
 			else
 				e_b = error / e_b;
-			E_b.at<float>(i, j) = e_b * W_b.at<float>(i, j) /(1 + pow((float)P.at<uchar>(i, j), 2));
+			E_b.at<float>(i, j) = e_b * W_b.at<float>(i, j) /(1 + (float)P.at<uchar>(i, j));
 		}
 	}
 
@@ -194,18 +152,9 @@ void Img::computeError()
 	{
 		displayImg(C, 0, 0);
 		saveImg("Combined.png", C);
-		int totalNumSamples = 0;
-		for(int i = 0; i < height; i++)
-			for (int j = 0; j < width; j++)
-			{
-				totalNumSamples += int(P.at<uchar>(i, j));
-			}
 
-		cout << "Total number of samples: " << totalNumSamples << endl;
+		//displayImg(F_v, 1, 1);
 	}
-
-	//displayImg(C, 0, 0);
-	//saveImg("Combined.png", C);
 
 	// Sum of weighted error maps
 	Mat errorMap;
@@ -214,43 +163,68 @@ void Img::computeError()
 	Mat result;
 	GaussianBlur(errorMap, result, Size(3, 3), 0.8);
 	if (isStop)
-	{
 		displayImg(result, 1, 1);
-	}
-	//displayImg(result, 1, 1);
-	//imwrite("D://Github//temp//weightedError.png", combined);
 
 	// Normalize
 	//normalize(result, result, 0, 1, NORM_MINMAX);
 	float s = sum(result)[0];
-	result = float(budget * height * width) / (2.0f * s) * result;//---------------------
+	//result = float(budget * height * width) / (2.0f * s) * result;
+	result = float(budget * height * width) / s * result;
 
 	// Clamp the values
-	int checksum = 0;
-	for (int i = 0; i < height; i++)
-		for (int j = 0; j < width; j++)
-			checksum += result.at<float>(i, j);
-
-	//cout << checksum << endl;
-	int threshold = 64;
+	int threshold = 4;
 	for (int i = 0; i < height; i++)
 	{
 		for (int j = 0; j < width; j++)
 		{
 			if (result.at<float>(i, j) > threshold)
-			{
-				result.at<float>(i, j) = 64.0f;
-			}
-			//P_.at<uchar>(i, j) = uchar(int(sqrt(result.at<float>(i, j))));
+				result.at<float>(i, j) = threshold;
+
 			int extraRayNum = int(result.at<float>(i, j));
-			if(extraRayNum % 2 != 0)
+
+			if (extraRayNum % 2 != 0)
 				P_.at<uchar>(i, j) = uchar(extraRayNum + 1);
 			else
 				P_.at<uchar>(i, j) = uchar(extraRayNum);
 		}
 	}
-	
-	//cout << P_.at<uchar>(500, 500) << endl;
+
+	/*
+	int maxRayNum = 0;
+	int maxERayNum = 0;
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++)
+		{
+			int val = (int)P.at<uchar>(i, j);
+			int eval = (int)P_.at<uchar>(i, j);
+			if (val > maxRayNum)
+				maxRayNum = val;
+			if (eval > maxERayNum)
+				maxERayNum = eval;
+		}
+	}
+
+	cout << "Maximum nspp so far is: " << maxRayNum << endl;
+	cout << "Maximum to be added nspp is: " << maxERayNum << endl;
+
+	int totalNumSamples = 0;
+	for(int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
+			totalNumSamples += int(P.at<uchar>(i, j));
+
+	cout << "Total number of samples drawn so far: " << totalNumSamples << endl;
+
+	int numdraw = 0;
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
+		{
+			if (int(P_.at<uchar>(i, j)) > 0)
+				numdraw++;
+		}
+
+	cout << "Total number of pixels with more than 0 rays at next iter: " << numdraw << endl;
+	*/
 }
 
 void Img::combineBuffers(Mat & M0, Mat & M1)
@@ -282,9 +256,7 @@ void Img::filter(Mat& M0, Mat& M1, int mode)
 		W_b = Mat(height, width, CV_32FC1, 0.0);
 	}
 	else
-	{
 		F_v = M0.clone();
-	}
 	
 	clock_t t;
 	t = clock();
@@ -309,8 +281,8 @@ void Img::filter(Mat& M0, Mat& M1, int mode)
 	}
 
 	t = clock() - t;
-	int seconds = ((double)t) / CLOCKS_PER_SEC;
-	cout << seconds << " seconds elapsed in filtering" << endl;
+	float seconds = ((double)t) / CLOCKS_PER_SEC;
+	//cout << seconds << " seconds elapsed in filtering" << endl;
 }
 
 float Img::filterPixel(int i, int j, Mat& M0, Mat& M1, int mode)
@@ -431,21 +403,6 @@ Vec3f Img::getModDistPix(int pi, int pj, int qi, int qj, Mat & M, int mode)
 		diffr = (diffr - a * (pf.z + min(pf.z, qf.z))) / (div.z);
 
 	return Vec3f(diffb, diffg, diffr);
-}
-
-Mat Img::mul()
-{
-	Mat M(height, width, CV_32FC3, Scalar(0, 0, 0));
-	for(int i = 0; i < height; i++)
-		for (int j = 0; j < height; j++)
-		{
-			//M.at<Vec3f>(i, j).val[0] = float(A.at<Vec3b>(i, j).val[0]) * P.at<int>(i, j);
-			//M.at<Vec3f>(i, j).val[1] = float(A.at<Vec3b>(i, j).val[1]) * P.at<int>(i, j);
-			//M.at<Vec3f>(i, j).val[2] = float(A.at<Vec3b>(i, j).val[2]) * P.at<int>(i, j);
-		}
-
-	//displayImg(M, 1, 0);
-	return M;
 }
 
 void Img::printResult()

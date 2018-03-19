@@ -34,9 +34,6 @@ public:
 	// Render each pixel
 	void RenderPixel(int x, int y);
 
-	// Multi-threading
-	void BlockProcess(Scene &s, float scaleX, float scaleY, int counter, vector<glm::vec2> samples);
-
 	// Calculated empirical variance
 	glm::vec3 getVariance(Color & avg, vector<Color>& colors, int mode);
 

@@ -6,6 +6,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
+
 using namespace cv;
 using namespace std;
 
@@ -21,7 +22,6 @@ public:
 	void setBudget(int b) 
 	{ 
 		budget = b; 
-		//P = Mat(height, width, CV_32SC1, budget);
 	};
 	void sendToA(int i, int j, glm::vec3 variance, glm::vec3 color);
 	void sendToB(int i, int j, glm::vec3 variance, glm::vec3 color);
@@ -30,7 +30,7 @@ public:
 	void stop();
 
 	// Send information to path tracer
-	int getSampleNum(int i, int j) { return (float)P_.at<uchar>(i, j); };
+	int getSampleNum(int i, int j) { return (int)P_.at<uchar>(i, j); };
 
 	// Variance computation
 	void initVarEst();
@@ -49,14 +49,16 @@ public:
 	Vec3f getModDistPix(int pi, int pj, int qi, int qj, Mat & M, int mode);
 
 	float getWeight(float patchDist) { return exp(-1.0f * max(0.0f, patchDist)); };
-	void setConstants(int r_, int f_) {
+
+	// Constants
+	void setConstants(int r_, int f_) 
+	{
 		r = r_; f = f_; normc = float(3 * pow(2 * f + 1, 2));
 	};
 	void setConstants2(float a_, float e_, float k_) { a = a_; e = e_; k = k_; };
 
-	Mat mul();
-
 	void printResult();
+
 private:
 
 	// Dual image buffers
@@ -71,8 +73,6 @@ private:
 
 	// Combined
 	Mat C;
-
-	Mat AA, BB;
 
 	// Constants
 	int r, f;

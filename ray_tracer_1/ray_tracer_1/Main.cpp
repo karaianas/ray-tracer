@@ -32,22 +32,14 @@ void project2();
 void project3();
 
 void filter_test();
+void adaptiveRendering();
 
 ////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc,char **argv) 
 {
 	I = new Img(height, width);
-	
-	// Initial path tracing
-	cout << "Path tracing started..." << endl;
-	project3();
-	cout << "Initial path tracing complete." << endl;
-
-	// Filtering
-	//filter_test();
-
-	cout << "Variance filtered" << endl;
+	adaptiveRendering();
 
 	while (1)
 	{
@@ -56,6 +48,119 @@ int main(int argc,char **argv)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void adaptiveRendering()
+{
+	// Create scene
+	Scene scn;
+	scn.SetSkyColor(Color(0.8f, 0.9f, 1.0f));
+
+	// Create ground
+	LambertMaterial groundMtl;
+	groundMtl.SetColor(Color(0.25f, 0.25f, 0.25f));
+	MeshObject ground;
+	ground.MakeBox(2.0f, 0.11f, 2.0f, &groundMtl);
+	scn.AddObject(ground);
+
+	// Load dragon mesh
+	MeshObject dragon;
+	dragon.LoadPLY(".//Models//dragon.ply");
+
+	// Create box tree
+	BoxTreeObject tree;
+	tree.Construct(dragon);
+
+	// Materials
+	LambertMaterial white;
+	white.SetColor(Color(0.7f, 0.7f, 0.7f));
+	LambertMaterial red;
+	red.SetColor(Color(0.7f, 0.1f, 0.1f));
+	FresnelMetalMaterial metal;
+	metal.SetColor(Color(0.95f, 0.64f, 0.54f));
+	const int numDragons = 4;
+	Material *mtl[numDragons] = { &white,&metal,&red,&white };
+
+	// Create dragon instances
+	glm::mat4 mtx;
+	for (int i = 0; i<numDragons; i++) 
+	{
+		InstanceObject *inst = new InstanceObject(tree);
+		mtx[3] = glm::vec4(0.0f, 0.0f, 0.3f*(float(i) / float(numDragons - 1) - 0.5f), 1.0f);
+		inst->SetMatrix(mtx);
+		inst->SetMaterial(mtl[i]);
+		scn.AddObject(*inst);
+	}
+
+	// Create lights
+	DirectLight sunlgt;
+	sunlgt.SetBaseColor(Color(1.0f, 1.0f, 0.9f));
+	sunlgt.SetIntensity(1.0f);
+	sunlgt.SetDirection(glm::vec3(2.0f, -3.0f, -2.0f));
+	scn.AddLight(sunlgt);
+
+	// Create camera
+	cam.SetResolution(width, height);
+	cam.SetAspect(float(width) / (float)height);
+	cam.LookAt(1.3f *glm::vec3(-0.5f, 0.15f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
+	cam.SetFOV(40.0f);
+
+	// Camera settings
+	int nx, ny;
+	cout << "Enter the sample budget: ";
+	cin >> nx >> ny;
+	I->setBudget(nx * ny);
+	cam.SetJitter(true);
+	cam.I = I;
+
+	clock_t startTime;
+	startTime = clock();
+	// Filter settings
+	int niter = 6;
+	for (int i = 0; i < niter; i++)
+	{
+		cout << "===================== " << i << " =====================" << endl;
+
+		clock_t t;
+		t = clock();
+
+		// Render image
+		cam.Render(scn);
+
+		// (1) Filter variances
+		I->setConstants(1, 3);
+		I->setConstants2(4.0f, 1.0f, 0.45f * 0.45f);
+		I->Filter(1);
+
+		// (2) Filter images
+		// (3, 1) works best for 4by4
+		I->setConstants(1, 3);// (7, 3) in the original paper(1, 3)
+		I->setConstants2(0.5f, 1.0f, 0.45f * 0.45f);
+		I->Filter(0);
+
+		// (3) Compute error
+		I->computeError();
+
+		t = clock() - t;
+		float seconds = ((double)t) / CLOCKS_PER_SEC;
+		printf("Iteration Time: %2.2f seconds\n", seconds);
+
+		//// Save image
+		//string name = "D://Github//temp//test_";
+		//name += to_string(nx);
+		//name += "by";
+		//name += to_string(ny);
+		//name += "_";
+		//name += to_string(seconds);
+		//name += ".bmp";
+		//cam.SaveBitmap((char*)name.c_str());
+
+		cout << endl;
+	}
+
+	clock_t dT = clock() - startTime;
+	float duration = ((double)dT) / CLOCKS_PER_SEC;
+	printf("Total Time: %2.2f seconds\n", duration);
+}
+
 void filter_test()
 {
 	for (int i = 0; i < 4; i++)
@@ -125,92 +230,28 @@ void project3()
 	scn.AddLight(sunlgt);
 	
 	// Create camera
-	//Camera cam; 
-	//cam.SetResolution(640, 480);
-	cam.SetResolution(width, height);
-	//cam.SetAspect(1.33f);
-	cam.SetAspect(float(width)/(float)height);
-	//cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
-	cam.LookAt(1.3f *glm::vec3(-0.5f, 0.15f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
+	Camera cam; 
+	cam.SetResolution(640, 480);
+	cam.SetAspect(1.33f);
+	cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
 	cam.SetFOV(40.0f);
 	
-	int nx, ny;
-	cout << "Enter number of samples: ";
-	cin >> nx >> ny;
-	I->setBudget(nx * ny);
+	int nx = 8;
+	int ny = 8;
 	cam.SetSuperSample(nx, ny);
 	cam.SetJitter(true);
 	//cam.SetShirley(true);
 	
-	// Filter test
-	cam.I = I;
+	// Render image
+	cam.Render(scn);
 
-	//clock_t t;
-	//t = clock();
-
-	//// Render image
-	//cam.Render(scn);
-
-	//t = clock() - t;
-	//int seconds = ((double)t) / CLOCKS_PER_SEC;
-	////printf("Time: %d clicks (%f seconds).\n", t, seconds);
-	//cout << seconds << " seconds elapsed in rendering" << endl;
-
-	//// Save image
-	//string name = "D://Github//temp//test_";
-	//name += to_string(nx);
-	//name += "by";
-	//name += to_string(ny);
-	//name += "_";
-	//name += to_string(seconds);
-	//name += ".bmp";
-	//cam.SaveBitmap((char*)name.c_str());
-
-	//I->printResult();
-
-	int niter = 9;
-	for (int i = 0; i < niter; i++)
-	{
-		clock_t t;
-		t = clock();
-
-		// Render image
-		cam.Render(scn);
-
-		t = clock() - t;
-		int seconds = ((double)t) / CLOCKS_PER_SEC;
-		//printf("Time: %d clicks (%f seconds).\n", t, seconds);
-		cout << seconds << " seconds elapsed in rendering" << endl;
-
-		// (1) Filter variances
-		I->setConstants(1, 3);// 1, 3
-		I->setConstants2(4.0f, 1.0f, 0.45f * 0.45f);
-		I->Filter(1);
-
-		// (2) Filter images
-		// (3, 1) works best for 4by4
-		I->setConstants(1, 3);// (7, 3) in the original paper(1, 3)
-		I->setConstants2(0.5f, 1.0f, 0.45f * 0.45f);
-		I->Filter(0);
-
-		// (3) Compute error
-		if (i == niter - 1)
-			I->stop();
-		I->computeError();
-
-		//// Save image
-		//string name = "D://Github//temp//test_";
-		//name += to_string(nx);
-		//name += "by";
-		//name += to_string(ny);
-		//name += "_";
-		//name += to_string(seconds);
-		//name += ".bmp";
-		//cam.SaveBitmap((char*)name.c_str());
-	}
-	////I->printResult();
-
-
+	// Save image
+	string name = "D://Github//temp//test_";
+	name += to_string(nx);
+	name += "by";
+	name += to_string(ny);
+	name += ".bmp";
+	cam.SaveBitmap((char*)name.c_str());
 }
 
 void project2()
