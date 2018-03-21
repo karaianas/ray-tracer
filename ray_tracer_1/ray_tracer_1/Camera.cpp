@@ -107,13 +107,13 @@ void Camera::Render(Scene & s)
 					c.Scale(1.0f / float(spp));
 
 					// *********************************
-					//BMP->SetPixel(x, y, c.ToInt());
+					BMP->SetPixel(x, y, c.ToInt());
 					// *********************************
 
 					// Need to calculate empirical variances here
-					I->sendToV(YRes - y - 1, x, getVariance(c, tcolors, 0));
-					I->sendToA(YRes - y - 1, x, getVariance(a, tcolors, 1), glm::vec3(a.Red, a.Green, a.Blue));
-					I->sendToB(YRes - y - 1, x, getVariance(b, tcolors, 2), glm::vec3(b.Red, b.Green, b.Blue));
+					//I->sendToV(YRes - y - 1, x, getVariance(c, tcolors, 0));
+					//I->sendToA(YRes - y - 1, x, getVariance(a, tcolors, 1), glm::vec3(a.Red, a.Green, a.Blue));
+					//I->sendToB(YRes - y - 1, x, getVariance(b, tcolors, 2), glm::vec3(b.Red, b.Green, b.Blue));
 					
 				}
 			}

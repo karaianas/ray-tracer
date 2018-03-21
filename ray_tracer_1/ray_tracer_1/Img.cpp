@@ -408,5 +408,6 @@ void Img::printResult()
 {
 	displayImg(C, 0, 0);
 	saveImg("FinalResult.png", C, 0);
+	//saveImg("E_map.png", E_map, 1);
 }
 

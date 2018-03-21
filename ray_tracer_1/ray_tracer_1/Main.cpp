@@ -134,7 +134,7 @@ void adaptiveRendering()
 		//I->saveImg("InitA.png", I->A, 0);
 		//I->saveImg("InitB.png", I->B, 0);
 
-		
+		/*
 		// (1) Filter variances
 		I->setConstants(1, 3);
 		I->setConstants2(4.0f, 1.0f, 0.45f * 0.45f);
@@ -160,6 +160,7 @@ void adaptiveRendering()
 
 		// ***********************
 		//I->saveImg("EMAP.png", I->E_map, 1);
+		*/
 
 		t = clock() - t;
 		float seconds = ((double)t) / CLOCKS_PER_SEC;
@@ -176,7 +177,8 @@ void adaptiveRendering()
 
 	//cout << "Total number of samples: " << sum(I->P)[0];
 	// Save images
-	I->printResult();
+	//I->printResult();
+	cam.SaveBitmap("D://Github//temp//Naive.bmp");
 
 	//string name = "D://Github//temp//test_";
 	//name += to_string(nx);
