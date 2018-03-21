@@ -134,7 +134,6 @@ void adaptiveRendering()
 		//I->saveImg("InitA.png", I->A, 0);
 		//I->saveImg("InitB.png", I->B, 0);
 
-		/*
 		// (1) Filter variances
 		I->setConstants(1, 3);
 		I->setConstants2(4.0f, 1.0f, 0.45f * 0.45f);
@@ -160,7 +159,7 @@ void adaptiveRendering()
 
 		// ***********************
 		//I->saveImg("EMAP.png", I->E_map, 1);
-		*/
+		
 
 		t = clock() - t;
 		float seconds = ((double)t) / CLOCKS_PER_SEC;
@@ -175,19 +174,9 @@ void adaptiveRendering()
 	float duration = ((double)dT) / CLOCKS_PER_SEC;
 	printf("Total Time: %2.2f seconds\n", duration);
 
-	//cout << "Total number of samples: " << sum(I->P)[0];
 	// Save images
-	//I->printResult();
-	cam.SaveBitmap("D://Github//temp//Naive.bmp");
-
-	//string name = "D://Github//temp//test_";
-	//name += to_string(nx);
-	//name += "by";
-	//name += to_string(ny);
-	//name += "_";
-	//name += to_string(seconds);
-	//name += ".bmp";
-	//cam.SaveBitmap((char*)name.c_str());
+	I->printResult();
+	//cam.SaveBitmap("D://Github//temp//Naive.bmp");
 }
 
 void project3()

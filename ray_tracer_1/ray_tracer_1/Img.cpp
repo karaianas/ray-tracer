@@ -187,43 +187,6 @@ void Img::computeError(int niter)
 				P_.at<uchar>(i, j) = uchar(extraRayNum);
 		}
 	}
-
-	/*
-	int maxRayNum = 0;
-	int maxERayNum = 0;
-	for (int i = 0; i < height; i++)
-	{
-		for (int j = 0; j < width; j++)
-		{
-			int val = (int)P.at<uchar>(i, j);
-			int eval = (int)P_.at<uchar>(i, j);
-			if (val > maxRayNum)
-				maxRayNum = val;
-			if (eval > maxERayNum)
-				maxERayNum = eval;
-		}
-	}
-
-	cout << "Maximum nspp so far is: " << maxRayNum << endl;
-	cout << "Maximum to be added nspp is: " << maxERayNum << endl;
-
-	int totalNumSamples = 0;
-	for(int i = 0; i < height; i++)
-		for (int j = 0; j < width; j++)
-			totalNumSamples += int(P.at<uchar>(i, j));
-
-	cout << "Total number of samples drawn so far: " << totalNumSamples << endl;
-
-	int numdraw = 0;
-	for (int i = 0; i < height; i++)
-		for (int j = 0; j < width; j++)
-		{
-			if (int(P_.at<uchar>(i, j)) > 0)
-				numdraw++;
-		}
-
-	cout << "Total number of pixels with more than 0 rays at next iter: " << numdraw << endl;
-	*/
 }
 
 void Img::combineBuffers(Mat & M0, Mat & M1)
